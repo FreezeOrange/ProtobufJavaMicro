@@ -21,6 +21,9 @@ public class PrimitiveFieldVariables extends AbstractFieldVariables {
     public String message_name;
     public boolean isFastStringHandling;
     public boolean isVariableLenType;
+    public boolean isRenferenceType;
+    public boolean isPacked;
+    public boolean fixedSizeEqualNegOne;
 
     public static PrimitiveFieldVariables create(Descriptors.FieldDescriptor descriptor, Params params) {
         PrimitiveFieldVariables variables = new PrimitiveFieldVariables();
@@ -34,19 +37,22 @@ public class PrimitiveFieldVariables extends AbstractFieldVariables {
         variables.tag = Helpers.getTag(descriptor) + "";
         variables.tag_size = Helpers.getTagSize(descriptor) + "";
         if (isReferenceType(descriptor.getJavaType())) {
-            variables.null_check = "    if (value == null) {\n"
-                    + "        throw new NullPointerException();\n"
-                    + "    }\n";
+            variables.null_check = "if (value == null) {\n"
+                    + "    throw new NullPointerException();\n"
+                    + "}\n";
         } else {
             variables.null_check = "";
         }
         int fixedSize = fixedSize(descriptor.getType());
+        variables.fixedSizeEqualNegOne = fixedSize == -1;
         if (fixedSize != -1) {
             variables.fixed_size = fixedSize + "";
         }
         variables.message_name = descriptor.getContainingType().getName();
         variables.isFastStringHandling = isFastStringHandling(descriptor, params);
         variables.isVariableLenType = isVariableLenType(descriptor.getJavaType());
+        variables.isRenferenceType = isReferenceType(descriptor.getJavaType());
+        variables.isPacked = descriptor.isPacked();
         return variables;
     }
 
