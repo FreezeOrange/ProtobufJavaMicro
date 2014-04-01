@@ -1,0 +1,1 @@
+set<variables.capitalized_name>(input.read<variables.capitalized_name>());

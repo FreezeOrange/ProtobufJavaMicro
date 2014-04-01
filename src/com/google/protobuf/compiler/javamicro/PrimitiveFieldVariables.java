@@ -19,6 +19,8 @@ public class PrimitiveFieldVariables extends AbstractFieldVariables {
     public String null_check;
     public String fixed_size;
     public String message_name;
+    public boolean isFastStringHandling;
+    public boolean isVariableLenType;
 
     public static PrimitiveFieldVariables create(Descriptors.FieldDescriptor descriptor, Params params) {
         PrimitiveFieldVariables variables = new PrimitiveFieldVariables();
@@ -43,6 +45,8 @@ public class PrimitiveFieldVariables extends AbstractFieldVariables {
             variables.fixed_size = fixedSize + "";
         }
         variables.message_name = descriptor.getContainingType().getName();
+        variables.isFastStringHandling = isFastStringHandling(descriptor, params);
+        variables.isVariableLenType = isVariableLenType(descriptor.getJavaType());
         return variables;
     }
 
