@@ -1,7 +1,6 @@
 package com.google.protobuf.compiler.javamicro;
 
 import com.google.protobuf.Descriptors;
-import com.google.protobuf.WireFormat;
 
 /**
  * Created with IntelliJ IDEA.

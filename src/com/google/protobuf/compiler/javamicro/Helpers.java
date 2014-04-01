@@ -10,6 +10,13 @@ import com.google.protobuf.WireFormat;
  */
 public class Helpers {
 
+    public static boolean isOuterClassNeeded(Params params, Descriptors.FileDescriptor descriptor) {
+        if (descriptor.getEnumTypes().size() > 0 || descriptor.getExtensions().size() > 0) {
+            return true;
+        }
+        return !params.isJavaMultipleFiles(descriptor.getName());
+    }
+
     public static String getBoxedPrimitiveTypeName(Descriptors.FieldDescriptor.JavaType javaType) {
         switch (javaType) {
             case INT:
