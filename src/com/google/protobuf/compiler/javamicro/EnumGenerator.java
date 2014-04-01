@@ -10,7 +10,7 @@ import java.util.List;
  * Date: 2014/3/27
  */
 public class EnumGenerator {
-    private Descriptors.EnumDescriptor enumDescriptor;
+    private Descriptors.EnumDescriptor descriptor;
     private Params params;
 
     /**
@@ -29,14 +29,14 @@ public class EnumGenerator {
 
     private List<Alias> aliases = new ArrayList<Alias>();
 
-    public EnumGenerator(Descriptors.EnumDescriptor enumDescriptor, Params params) {
-        this.enumDescriptor = enumDescriptor;
+    public EnumGenerator(Descriptors.EnumDescriptor descriptor, Params params) {
+        this.descriptor = descriptor;
         this.params = params;
 
-        List<Descriptors.EnumValueDescriptor> values = enumDescriptor.getValues();
+        List<Descriptors.EnumValueDescriptor> values = descriptor.getValues();
         for (int i = 0, len = values.size(); i < len; ++i) {
             Descriptors.EnumValueDescriptor value = values.get(i);
-            Descriptors.EnumValueDescriptor canonical_value = enumDescriptor.findValueByNumber(value.getNumber());
+            Descriptors.EnumValueDescriptor canonical_value = descriptor.findValueByNumber(value.getNumber());
             if (value == canonical_value) {
                 canonicalValues.add(value);
             } else {
@@ -51,7 +51,7 @@ public class EnumGenerator {
     @Override
     public String toString() {
         StringBuilder generateCode = new StringBuilder();
-        generateCode.append(String.format("// enum %s\n", enumDescriptor.getName()));
+        generateCode.append(String.format("// enum %s\n", descriptor.getName()));
         for (Descriptors.EnumValueDescriptor descriptor : canonicalValues) {
             generateCode.append(String.format("public static final int %s = %d;\n",
                     descriptor.getName(), descriptor.getNumber()));
