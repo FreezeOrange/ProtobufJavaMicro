@@ -21,6 +21,7 @@ public class FileGenerator {
         variables = FileVariables.create(params, descriptor);
     }
 
+    // TODO 还有部分输出没有移植
     public void generate(StringBuilder code) {
         // We don't import anything because we refer to all classes by their
         // fully-qualified names in the generated source.
