@@ -1,0 +1,83 @@
+option java_package = "code.baidu.protobuf";
+option java_multiple_files = true;
+
+enum EnumFieldTester {
+    ELE_1 = 1;
+    ELE_2 = 1;          // 测试两个 enum 变量的 number 相同的情况
+    ELE_3 = 2;
+    ELE_4 = 3;
+    ELE_5 = 4;
+}
+
+message MessageFieldTester {
+    optional int32 id = 1;
+}
+
+message OptionalFieldTester {
+    optional int32 a1 = 1;
+    optional uint32 a2 = 2;
+    optional sint32 a3 = 3;
+    optional fixed32 a4 = 4;
+    optional sfixed32 a5 = 5;
+
+    optional int64 a6 = 6;
+    optional uint64 a7 = 7;
+    optional sint64 a8 = 8;
+    optional fixed64 a9 = 9;
+    optional sfixed64 a10 = 10;
+
+    optional bool a11 = 11;
+    optional float a12 = 12;
+    optional double a13 = 13;
+    optional string a14 = 14;
+    optional bytes a15 = 15;
+
+    optional EnumFieldTester a16 = 16;
+    optional MessageFieldTester a17 = 17;
+}
+
+message RepeatedFieldTester {
+    repeated int32 a1 = 1;
+    repeated uint32 a2 = 2;
+    repeated sint32 a3 = 3;
+    repeated fixed32 a4 = 4;
+    repeated sfixed32 a5 = 5;
+
+    repeated int64 a6 = 6;
+    repeated uint64 a7 = 7;
+    repeated sint64 a8 = 8;
+    repeated fixed64 a9 = 9;
+    repeated sfixed64 a10 = 10;
+
+    repeated bool a11 = 11;
+    repeated float a12 = 12;
+    repeated double a13 = 13;
+    repeated string a14 = 14;
+    repeated bytes a15 = 15;
+
+    repeated EnumFieldTester a16 = 16;
+    repeated MessageFieldTester a17 = 17;
+}
+
+message RequiredFieldTester {
+    required int32 a1 = 1;
+    required uint32 a2 = 2;
+    required sint32 a3 = 3;
+    required fixed32 a4 = 4;
+    required sfixed32 a5 = 5;
+
+    required int64 a6 = 6;
+    required uint64 a7 = 7;
+    required sint64 a8 = 8;
+    required fixed64 a9 = 9;
+    required sfixed64 a10 = 10;
+
+    required bool a11 = 11;
+    required float a12 = 12;
+    required double a13 = 13;
+    required string a14 = 14;
+    required bytes a15 = 15;
+
+    required EnumFieldTester a16 = 16;
+    required MessageFieldTester a17 = 17;
+}
