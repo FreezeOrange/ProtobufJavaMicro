@@ -210,6 +210,11 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor, const Params param
   }
   (*variables)["message_name"] = descriptor->containing_type()->name();
   (*variables)["original_name"] = descriptor->name();
+  if (descriptor->type() == FieldDescriptor::TYPE_BYTES) {
+    (*variables)["bytes_method"] = ".toStringUtf8()";
+  } else {
+    (*variables)["bytes_method"] = "";
+  }
 }
 }  // namespace
 
@@ -227,7 +232,7 @@ void PrimitiveFieldGenerator::
 GenerateToJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (has$capitalized_name$()) {\n"
-    "  stringer.key(\"$original_name$\").value(get$capitalized_name$());\n"
+    "  stringer.key(\"$original_name$\").value(get$capitalized_name$()$bytes_method$);\n"
     "}\n");
 }
 
@@ -357,7 +362,7 @@ GenerateToJsonCode(io::Printer* printer) const {
     "if (count > 0) {\n"
     "  stringer.key(\"$original_name$\").array();\n"
     "  for (int i = 0; i < count; ++i) {\n"
-    "    stringer.value(get$capitalized_name$(i));\n"
+    "    stringer.value(get$capitalized_name$(i)$bytes_method$);\n"
     "  }\n"
     "  stringer.endArray();\n"
     "}\n");
