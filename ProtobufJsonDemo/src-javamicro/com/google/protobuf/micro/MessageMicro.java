@@ -30,6 +30,9 @@
 
 package com.google.protobuf.micro;
 
+import org.json.JSONException;
+import org.json.JSONStringer;
+
 import java.io.IOException;
 
 /**
@@ -134,5 +137,12 @@ public abstract class MessageMicro {
             final CodedInputStreamMicro input,
             final int tag) throws IOException {
         return input.skipField(tag);
+    }
+
+    public String toJSON() throws JSONException {
+        JSONStringer stringer = new JSONStringer();
+        stringer.object();
+        stringer.endObject();
+        return stringer.toString();
     }
 }

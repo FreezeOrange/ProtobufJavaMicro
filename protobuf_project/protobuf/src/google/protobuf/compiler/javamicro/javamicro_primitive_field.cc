@@ -223,6 +223,14 @@ PrimitiveFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 PrimitiveFieldGenerator::~PrimitiveFieldGenerator() {}
 
 void PrimitiveFieldGenerator::
+GenerateToJsonCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (has$capitalized_name$()) {\n"
+    "  stringer.key(\"$name$\").value(get$capitalized_name$());\n"
+    "}\n");
+}
+
+void PrimitiveFieldGenerator::
 GenerateMembers(io::Printer* printer) const {
   printer->Print(variables_,
     "private boolean has$capitalized_name$;\n"
@@ -340,6 +348,19 @@ RepeatedPrimitiveFieldGenerator(const FieldDescriptor* descriptor, const Params&
 }
 
 RepeatedPrimitiveFieldGenerator::~RepeatedPrimitiveFieldGenerator() {}
+
+void RepeatedPrimitiveFieldGenerator::
+GenerateToJsonCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "count = get$capitalized_name$Count();\n"
+    "if (count > 0) {\n"
+    "  stringer.key(\"$name$\").array();\n"
+    "  for (int i = 0; i < count; ++i) {\n"
+    "    stringer.value(get$capitalized_name$(i));\n"
+    "  }\n"
+    "  stringer.endArray();\n"
+    "}\n");
+}
 
 void RepeatedPrimitiveFieldGenerator::
 GenerateMembers(io::Printer* printer) const {

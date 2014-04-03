@@ -134,6 +134,17 @@ static bool HasRequiredFields(const Descriptor* type) {
   return HasRequiredFields(type, &already_seen);
 }
 
+bool HasRepeatedFields(const Descriptor* type) {
+  int count = type->field_count();
+  for (int i = 0; i < count; ++i) {
+    const FieldDescriptor* field = type->field(i);
+    if (field->is_repeated()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 }  // namespace
 
 // ===================================================================
@@ -219,12 +230,38 @@ void MessageGenerator::Generate(io::Printer* printer) {
   GenerateMessageSerializationMethods(printer);
   GenerateMergeFromMethods(printer);
   GenerateParseFromMethods(printer);
+  GenerateToJsonCode(printer);
 
   printer->Outdent();
   printer->Print("}\n\n");
 }
 
 // ===================================================================
+
+void MessageGenerator::
+GenerateToJsonCode(io::Printer* printer) {
+  scoped_array<const FieldDescriptor*> sorted_fields(
+    SortFieldsByNumber(descriptor_));
+  printer->Print(
+    "@Override\n"
+    "public String toJSON() throws org.json.JSONException {\n"
+    "  org.json.JSONStringer stringer = new org.json.JSONStringer();\n"
+    "  stringer.object();\n");
+  if (HasRepeatedFields(descriptor_)) {
+    printer->Print("  int count;\n");
+  }
+  printer->Indent();
+
+  for (int i = 0; i < descriptor_->field_count(); i++) {
+    field_generators_.get(sorted_fields[i]).GenerateToJsonCode(printer);
+  }
+
+  printer->Outdent();
+  printer->Print(
+    "  stringer.endObject();\n"
+    "  return stringer.toString();\n"
+    "}\n");
+}
 
 void MessageGenerator::
 GenerateMessageSerializationMethods(io::Printer* printer) {

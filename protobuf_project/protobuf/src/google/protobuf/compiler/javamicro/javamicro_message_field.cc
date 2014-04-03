@@ -78,6 +78,14 @@ MessageFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 MessageFieldGenerator::~MessageFieldGenerator() {}
 
 void MessageFieldGenerator::
+GenerateToJsonCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (has$capitalized_name$()) {\n"
+    "  stringer.key(\"$name$\").value(get$capitalized_name$().toJSON());\n"
+    "}\n");
+}
+
+void MessageFieldGenerator::
 GenerateMembers(io::Printer* printer) const {
   printer->Print(variables_,
     "private boolean has$capitalized_name$;\n"
@@ -158,6 +166,19 @@ RepeatedMessageFieldGenerator(const FieldDescriptor* descriptor, const Params& p
 }
 
 RepeatedMessageFieldGenerator::~RepeatedMessageFieldGenerator() {}
+
+void RepeatedMessageFieldGenerator::
+GenerateToJsonCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "count = get$capitalized_name$Count();\n"
+    "if (count > 0) {\n"
+    "  stringer.key(\"$name$\").array();\n"
+    "  for (int i = 0; i < count; ++i) {\n"
+    "    stringer.value(get$capitalized_name$(i).toJSON());\n"
+    "  }\n"
+    "  stringer.endArray();\n"
+    "}\n");
+}
 
 void RepeatedMessageFieldGenerator::
 GenerateMembers(io::Printer* printer) const {
