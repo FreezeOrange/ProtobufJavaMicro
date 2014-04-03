@@ -209,6 +209,7 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor, const Params param
     (*variables)["fixed_size"] = SimpleItoa(fixed_size);
   }
   (*variables)["message_name"] = descriptor->containing_type()->name();
+  (*variables)["original_name"] = descriptor->name();
 }
 }  // namespace
 
@@ -226,7 +227,7 @@ void PrimitiveFieldGenerator::
 GenerateToJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (has$capitalized_name$()) {\n"
-    "  stringer.key(\"$name$\").value(get$capitalized_name$());\n"
+    "  stringer.key(\"$original_name$\").value(get$capitalized_name$());\n"
     "}\n");
 }
 
@@ -354,7 +355,7 @@ GenerateToJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "count = get$capitalized_name$Count();\n"
     "if (count > 0) {\n"
-    "  stringer.key(\"$name$\").array();\n"
+    "  stringer.key(\"$original_name$\").array();\n"
     "  for (int i = 0; i < count; ++i) {\n"
     "    stringer.value(get$capitalized_name$(i));\n"
     "  }\n"
