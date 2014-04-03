@@ -363,12 +363,22 @@ GenerateParseFromMethods(io::Printer* printer) {
     "  return ($classname$) (new $classname$().mergeFrom(data));\n"
     "}\n"
     "\n"
+	"public static $classname$ parseFrom(byte[] data, int off, int len)\n"
+	"    throws com.google.protobuf.micro.InvalidProtocolBufferMicroException {\n"
+	"  return ($classname$) (new $classname$().mergeFrom(data, off, len));\n"
+	"}\n"
+	"\n"
     "public static $classname$ parseFrom(\n"
     "        com.google.protobuf.micro.CodedInputStreamMicro input)\n"
     "    throws java.io.IOException {\n"
     "  return new $classname$().mergeFrom(input);\n"
     "}\n"
-    "\n",
+    "\n"
+	"public static $classname$ parseFrom(java.io.InputStream inputStream)\n"
+	"    throws java.io.IOException {\n"
+	"  return parseFrom(com.google.protobuf.micro.CodedInputStreamMicro.newInstance(inputStream));\n"
+	"}\n"
+	"\n",
     "classname", descriptor_->name());
 }
 

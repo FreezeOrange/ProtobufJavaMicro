@@ -198,8 +198,9 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor, const Params param
   if (IsReferenceType(GetJavaType(descriptor))) {
     (*variables)["null_check"] =
         "  if (value == null) {\n"
-        "    throw new NullPointerException();\n"
-        "  }\n";
+        //"    throw new NullPointerException();\n"
+        "    return this;\n"
+		"  }\n";
   } else {
     (*variables)["null_check"] = "";
   }
