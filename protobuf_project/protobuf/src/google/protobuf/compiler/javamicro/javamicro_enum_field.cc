@@ -80,6 +80,14 @@ EnumFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 EnumFieldGenerator::~EnumFieldGenerator() {}
 
 void EnumFieldGenerator::
+GenerateFromJsonCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (json.has(\"$original_name$\")) {\n"
+    "  result.set$capitalized_name$(json.getInt(\"$original_name$\"));\n"
+    "}\n");
+}
+
+void EnumFieldGenerator::
 GenerateToJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (has$capitalized_name$()) {\n"
@@ -154,6 +162,18 @@ RepeatedEnumFieldGenerator(const FieldDescriptor* descriptor, const Params& para
 }
 
 RepeatedEnumFieldGenerator::~RepeatedEnumFieldGenerator() {}
+
+void RepeatedEnumFieldGenerator::
+GenerateFromJsonCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (json.has(\"$original_name$\")) {\n"
+    "  array = json.getJSONArray(\"$original_name$\");\n"
+    "  count = array.length();\n"
+    "  for (int i = 0; i < count; ++i) {\n"
+    "    result.add$capitalized_name$(array.getInt(i));\n"
+    "  }\n"
+    "}\n");
+}
 
 void RepeatedEnumFieldGenerator::
 GenerateToJsonCode(io::Printer* printer) const {

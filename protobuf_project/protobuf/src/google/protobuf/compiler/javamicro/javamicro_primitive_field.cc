@@ -229,6 +229,52 @@ PrimitiveFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 PrimitiveFieldGenerator::~PrimitiveFieldGenerator() {}
 
 void PrimitiveFieldGenerator::
+GenerateFromJsonCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (json.has(\"$original_name$\")) {\n");
+  printer->Indent();
+
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType) {
+  case JAVATYPE_INT:
+    printer->Print(variables_,
+      "result.set$capitalized_name$(json.getInt(\"$original_name$\"));\n");
+    break;
+  case JAVATYPE_LONG:
+    printer->Print(variables_,
+      "result.set$capitalized_name$(json.getLong(\"$original_name$\"));\n");
+    break;
+  case JAVATYPE_FLOAT:
+    printer->Print(variables_,
+      "result.set$capitalized_name$((float) json.getDouble(\"$original_name$\"));\n");
+    break;
+  case JAVATYPE_DOUBLE:
+    printer->Print(variables_,
+      "result.set$capitalized_name$(json.getDouble(\"$original_name$\"));\n");
+    break;
+  case JAVATYPE_BOOLEAN:
+    printer->Print(variables_,
+      "result.set$capitalized_name$(json.getBoolean(\"$original_name$\"));\n");
+    break;
+  case JAVATYPE_STRING:
+    printer->Print(variables_,
+      "result.set$capitalized_name$(json.getString(\"$original_name$\"));\n");
+    break;
+  case JAVATYPE_BYTES:
+    printer->Print(variables_,
+      "result.set$capitalized_name$(\n"
+      "        com.google.protobuf.micro.ByteStringMicro.copyFromUtf8(json.getString(\"$original_name$\")));\n");
+    break;
+  default:
+    GOOGLE_LOG(FATAL) << "Can't get here.";
+    break;
+  }
+
+  printer->Outdent();
+  printer->Print("}\n");
+}
+
+void PrimitiveFieldGenerator::
 GenerateToJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (has$capitalized_name$()) {\n"
@@ -354,6 +400,60 @@ RepeatedPrimitiveFieldGenerator(const FieldDescriptor* descriptor, const Params&
 }
 
 RepeatedPrimitiveFieldGenerator::~RepeatedPrimitiveFieldGenerator() {}
+
+void RepeatedPrimitiveFieldGenerator::
+GenerateFromJsonCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (json.has(\"$original_name$\")) {\n"
+    "  array = json.getJSONArray(\"$original_name$\");\n"
+    "  count = array.length();\n"
+    "  for (int i = 0; i < count; ++i) {\n");
+  printer->Indent();
+  printer->Indent();
+
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType)
+  {
+  case JAVATYPE_INT:
+    printer->Print(variables_,
+      "result.add$capitalized_name$(array.getInt(i));\n");
+    break;
+  case JAVATYPE_LONG:
+    printer->Print(variables_,
+      "result.add$capitalized_name$(array.getLong(i));\n");
+    break;
+  case JAVATYPE_FLOAT:
+    printer->Print(variables_,
+      "result.add$capitalized_name$((float) array.getDouble(i));\n");
+    break;
+  case JAVATYPE_DOUBLE:
+    printer->Print(variables_,
+      "result.add$capitalized_name$(array.getDouble(i));\n");
+    break;
+  case JAVATYPE_BOOLEAN:
+    printer->Print(variables_,
+      "result.add$capitalized_name$(array.getBoolean(i));\n");
+    break;
+  case JAVATYPE_STRING:
+    printer->Print(variables_,
+      "result.add$capitalized_name$(array.getString(i));\n");
+    break;
+  case JAVATYPE_BYTES:
+    printer->Print(variables_,
+      "result.add$capitalized_name$(\n"
+      "        com.google.protobuf.micro.ByteStringMicro.copyFromUtf8(array.getString(i)));\n");
+    break;
+  default:
+    GOOGLE_LOG(FATAL) << "Can't get here.";
+    break;
+  }
+
+  printer->Outdent();
+  printer->Outdent();
+  printer->Print(
+    "  }\n"
+    "}\n");
+}
 
 void RepeatedPrimitiveFieldGenerator::
 GenerateToJsonCode(io::Printer* printer) const {

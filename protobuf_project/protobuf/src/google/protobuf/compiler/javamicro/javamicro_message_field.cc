@@ -79,6 +79,15 @@ MessageFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 MessageFieldGenerator::~MessageFieldGenerator() {}
 
 void MessageFieldGenerator::
+GenerateFromJsonCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (json.has(\"$original_name$\")) {\n"
+    "  result.set$capitalized_name$(\n"
+    "          $type$.fromJSON(json.getJSONObject(\"$original_name$\").toString()));\n"
+    "}\n");
+}
+
+void MessageFieldGenerator::
 GenerateToJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (has$capitalized_name$()) {\n"
@@ -167,6 +176,19 @@ RepeatedMessageFieldGenerator(const FieldDescriptor* descriptor, const Params& p
 }
 
 RepeatedMessageFieldGenerator::~RepeatedMessageFieldGenerator() {}
+
+void RepeatedMessageFieldGenerator::
+GenerateFromJsonCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (json.has(\"$original_name$\")) {\n"
+    "  array = json.getJSONArray(\"$original_name$\");\n"
+    "  count = array.length();\n"
+    "  for (int i = 0; i < count; ++i) {\n"
+    "    result.add$capitalized_name$(\n"
+    "            $type$.fromJSON(array.getJSONObject(i).toString()));\n"
+    "  }\n"
+    "}\n");
+}
 
 void RepeatedMessageFieldGenerator::
 GenerateToJsonCode(io::Printer* printer) const {

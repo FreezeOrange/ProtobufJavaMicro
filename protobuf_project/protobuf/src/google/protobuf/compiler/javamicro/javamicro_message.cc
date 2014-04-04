@@ -231,12 +231,39 @@ void MessageGenerator::Generate(io::Printer* printer) {
   GenerateMergeFromMethods(printer);
   GenerateParseFromMethods(printer);
   GenerateToJsonCode(printer);
+  GenerateFromJsonCode(printer);
 
   printer->Outdent();
   printer->Print("}\n\n");
 }
 
 // ===================================================================
+
+void MessageGenerator::
+GenerateFromJsonCode(io::Printer* printer) {
+  scoped_array<const FieldDescriptor*> sorted_fields(
+    SortFieldsByNumber(descriptor_));
+  printer->Print(
+    "public static $classname$ fromJSON(String text) throws org.json.JSONException {\n"
+    "  org.json.JSONObject json = new org.json.JSONObject(text);\n"
+    "  $classname$ result = new $classname$();\n",
+    "classname", descriptor_->name());
+  if (HasRepeatedFields(descriptor_)) {
+    printer->Print(
+      "  org.json.JSONArray array;\n"
+      "  int count;\n");
+  }
+  printer->Indent();
+
+  for (int i = 0; i < descriptor_->field_count(); i++) {
+    field_generators_.get(sorted_fields[i]).GenerateFromJsonCode(printer);
+  }
+
+  printer->Outdent();
+  printer->Print(
+    "  return result;\n"
+    "}\n");
+}
 
 void MessageGenerator::
 GenerateToJsonCode(io::Printer* printer) {

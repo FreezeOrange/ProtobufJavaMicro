@@ -56,6 +56,7 @@ class EnumFieldGenerator : public FieldGenerator {
   void GenerateSerializationCode(io::Printer* printer) const;
   void GenerateSerializedSizeCode(io::Printer* printer) const;
   void GenerateToJsonCode(io::Printer* printer) const;
+  void GenerateFromJsonCode(io::Printer* printer) const;
 
   string GetBoxedType() const;
 
@@ -78,6 +79,7 @@ class RepeatedEnumFieldGenerator : public FieldGenerator {
   void GenerateSerializationCode(io::Printer* printer) const;
   void GenerateSerializedSizeCode(io::Printer* printer) const;
   void GenerateToJsonCode(io::Printer* printer) const;
+  void GenerateFromJsonCode(io::Printer* printer) const;
 
   string GetBoxedType() const;
 
