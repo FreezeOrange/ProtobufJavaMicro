@@ -287,7 +287,7 @@ GenerateToJsonCode(io::Printer* printer) {
   printer->Print(
     "  stringer.endObject();\n"
     "  return stringer.toString();\n"
-    "}\n");
+    "}\n\n");
 }
 
 void MessageGenerator::
