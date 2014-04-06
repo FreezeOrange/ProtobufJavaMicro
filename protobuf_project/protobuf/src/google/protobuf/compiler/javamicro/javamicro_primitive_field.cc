@@ -229,6 +229,101 @@ PrimitiveFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 PrimitiveFieldGenerator::~PrimitiveFieldGenerator() {}
 
 void PrimitiveFieldGenerator::
+GenerateWriteToParcelCode(io::Printer* printer) const {
+  printer->Print("{\n");
+  printer->Indent();
+  printer->Print(variables_,
+    "dest.writeByte((byte) (has$capitalized_name$ ? 1 : 0));\n");
+
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType)
+  {
+  case JAVATYPE_INT:
+    printer->Print(variables_,
+      "dest.writeInt($name$_);\n");
+    break;
+  case JAVATYPE_LONG:
+    printer->Print(variables_,
+      "dest.writeLong($name$_);\n");
+    break;
+  case JAVATYPE_FLOAT:
+    printer->Print(variables_,
+      "dest.writeFloat($name$_);\n");
+    break;
+  case JAVATYPE_DOUBLE:
+    printer->Print(variables_,
+      "dest.writeDouble($name$_);\n");
+    break;
+  case JAVATYPE_BOOLEAN:
+    printer->Print(variables_,
+      "dest.writeByte((byte) ($name$_ ? 1 : 0));\n");
+    break;
+  case JAVATYPE_STRING:
+    printer->Print(variables_,
+      "dest.writeString($name$_);\n");
+    break;
+  case JAVATYPE_BYTES:
+    printer->Print(variables_,
+      "dest.writeString($name$_.toStringUtf8());\n");
+    break;
+  default:
+    GOOGLE_LOG(FATAL) << "Can't get here.";
+    break;
+  }
+
+  printer->Outdent();
+  printer->Print("}\n");
+}
+
+void PrimitiveFieldGenerator::
+GenerateParcelableConstructorCode(io::Printer* printer) const {
+  printer->Print("{\n");
+  printer->Indent();
+  printer->Print(variables_,
+    "has$capitalized_name$ = source.readByte() == 1;\n");
+
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType)
+  {
+  case JAVATYPE_INT:
+    printer->Print(variables_,
+      "$name$_ = source.readInt();\n");
+    break;
+  case JAVATYPE_LONG:
+    printer->Print(variables_,
+      "$name$_ = source.readLong();\n");
+    break;
+  case JAVATYPE_FLOAT:
+    printer->Print(variables_,
+      "$name$_ = source.readFloat();\n");
+    break;
+  case JAVATYPE_DOUBLE:
+    printer->Print(variables_,
+      "$name$_ = source.readDouble();\n");
+    break;
+  case JAVATYPE_BOOLEAN:
+    printer->Print(variables_,
+      "$name$_ = source.readByte() == 1;\n");
+    break;
+  case JAVATYPE_STRING:
+    printer->Print(variables_,
+      "$name$_ = source.readString();\n");
+    break;
+  case JAVATYPE_BYTES:
+    printer->Print(variables_,
+      "$name$_ = com.google.protobuf.micro.ByteStringMicro\n"
+      "            .copyFromUtf8(source.readString());\n");
+    break;
+  default:
+    GOOGLE_LOG(FATAL) << "Can't get here.";
+    break;
+  }
+
+  printer->Outdent();
+  printer->Print("}\n");
+}
+
+void PrimitiveFieldGenerator::
 GenerateFromJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (json.has(\"$original_name$\")) {\n");
@@ -400,6 +495,23 @@ RepeatedPrimitiveFieldGenerator(const FieldDescriptor* descriptor, const Params&
 }
 
 RepeatedPrimitiveFieldGenerator::~RepeatedPrimitiveFieldGenerator() {}
+
+void RepeatedPrimitiveFieldGenerator::
+GenerateWriteToParcelCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "dest.writeList($name$_);\n");
+}
+
+void RepeatedPrimitiveFieldGenerator::
+GenerateParcelableConstructorCode(io::Printer* printer) const {
+  if (IsReferenceType(GetJavaType(descriptor_))) {
+    printer->Print(variables_,
+      "$name$_ = (java.util.List<$type$>) source.readArrayList(classLoader);\n");
+  } else {
+    printer->Print(variables_,
+      "$name$_ = (java.util.List<$boxed_type$>) source.readArrayList(classLoader);\n");
+  }
+}
 
 void RepeatedPrimitiveFieldGenerator::
 GenerateFromJsonCode(io::Printer* printer) const {

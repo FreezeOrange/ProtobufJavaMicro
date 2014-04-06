@@ -197,7 +197,7 @@ void MessageGenerator::Generate(io::Printer* printer) {
   printer->Print(
     "@SuppressWarnings(\"hiding\")\n"
     "public $modifiers$ final class $classname$ extends\n"
-    "    com.google.protobuf.micro.MessageMicro {\n",
+    "    com.google.protobuf.micro.MessageMicro implements android.os.Parcelable {\n",
     "modifiers", is_own_file ? "" : "static",
     "classname", descriptor_->name());
   printer->Indent();
@@ -233,11 +233,74 @@ void MessageGenerator::Generate(io::Printer* printer) {
   GenerateToJsonCode(printer);
   GenerateFromJsonCode(printer);
 
+  GenerateWriteToParcelCode(printer);
+  GenerateParcelableConstructorCode(printer);
+  GenerateParcelableCreatorCode(printer);
+
   printer->Outdent();
   printer->Print("}\n\n");
 }
 
 // ===================================================================
+
+void MessageGenerator::
+GenerateWriteToParcelCode(io::Printer* printer) {
+  scoped_array<const FieldDescriptor*> sorted_fields(
+    SortFieldsByNumber(descriptor_));
+  printer->Print(
+    "@Override\n"
+    "public void writeToParcel(android.os.Parcel dest, int flags) {\n");
+  printer->Indent();
+
+  for (int i = 0; i < descriptor_->field_count(); i++) {
+    field_generators_.get(sorted_fields[i]).GenerateWriteToParcelCode(printer);
+  }
+
+  printer->Outdent();
+  printer->Print(
+    "}\n\n");
+}
+
+void MessageGenerator::
+GenerateParcelableConstructorCode(io::Printer* printer) {
+  scoped_array<const FieldDescriptor*> sorted_fields(
+    SortFieldsByNumber(descriptor_));
+  printer->Print(
+    "private $classname$(android.os.Parcel source) {\n"
+    "  ClassLoader classLoader = getClass().getClassLoader();\n",
+    "classname", descriptor_->name());
+  printer->Indent();
+
+  for (int i = 0; i < descriptor_->field_count(); i++) {
+    field_generators_.get(sorted_fields[i]).GenerateParcelableConstructorCode(printer);
+  }
+
+  printer->Outdent();
+  printer->Print(
+    "}\n\n");
+}
+
+void MessageGenerator::
+GenerateParcelableCreatorCode(io::Printer* printer) {
+  printer->Print(
+    "public static final android.os.Parcelable.Creator<$classname$> CREATOR\n"
+    "        = new android.os.Parcelable.Creator<$classname$>() {\n"
+    "  @Override\n"
+    "  public $classname$ createFromParcel(android.os.Parcel source) {\n"
+    "    return new $classname$(source);\n"
+    "  }\n"
+    "\n"
+    "  @Override\n"
+    "  public $classname$[] newArray(int size) {\n"
+    "    return new $classname$[size];\n"
+    "  }\n"
+    "};\n\n"
+    "@Override\n"
+    "public int describeContents() {\n"
+    "  return 0;\n"
+    "}\n",
+    "classname", descriptor_->name());
+}
 
 void MessageGenerator::
 GenerateFromJsonCode(io::Printer* printer) {
@@ -262,7 +325,7 @@ GenerateFromJsonCode(io::Printer* printer) {
   printer->Outdent();
   printer->Print(
     "  return result;\n"
-    "}\n");
+    "}\n\n");
 }
 
 void MessageGenerator::

@@ -80,6 +80,10 @@ class MessageGenerator {
   void GenerateToJsonCode(io::Printer* printer);
   void GenerateFromJsonCode(io::Printer* printer);
 
+  void GenerateWriteToParcelCode(io::Printer* printer);
+  void GenerateParcelableConstructorCode(io::Printer* printer);
+  void GenerateParcelableCreatorCode(io::Printer* printer);
+
   const Params& params_;
   const Descriptor* descriptor_;
   FieldGeneratorMap field_generators_;

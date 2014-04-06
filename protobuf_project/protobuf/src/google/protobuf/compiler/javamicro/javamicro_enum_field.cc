@@ -80,6 +80,28 @@ EnumFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 EnumFieldGenerator::~EnumFieldGenerator() {}
 
 void EnumFieldGenerator::
+GenerateWriteToParcelCode(io::Printer* printer) const {
+  printer->Print("{\n");
+  printer->Indent();
+  printer->Print(variables_,
+    "dest.writeByte((byte) (has$capitalized_name$ ? 1 : 0));\n"
+    "dest.writeInt($name$_);\n");
+  printer->Outdent();
+  printer->Print("}\n");
+}
+
+void EnumFieldGenerator::
+GenerateParcelableConstructorCode(io::Printer* printer) const {
+  printer->Print("{\n");
+  printer->Indent();
+  printer->Print(variables_,
+    "has$capitalized_name$ = source.readByte() == 1;\n"
+    "$name$_ = source.readInt();\n");
+  printer->Outdent();
+  printer->Print("}\n");
+}
+
+void EnumFieldGenerator::
 GenerateFromJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (json.has(\"$original_name$\")) {\n"
@@ -162,6 +184,18 @@ RepeatedEnumFieldGenerator(const FieldDescriptor* descriptor, const Params& para
 }
 
 RepeatedEnumFieldGenerator::~RepeatedEnumFieldGenerator() {}
+
+void RepeatedEnumFieldGenerator::
+GenerateWriteToParcelCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "dest.writeList($name$_);\n");
+}
+
+void RepeatedEnumFieldGenerator::
+GenerateParcelableConstructorCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "$name$_ = (java.util.List<Integer>) source.readArrayList(classLoader);\n");
+}
 
 void RepeatedEnumFieldGenerator::
 GenerateFromJsonCode(io::Printer* printer) const {

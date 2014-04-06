@@ -79,6 +79,32 @@ MessageFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 MessageFieldGenerator::~MessageFieldGenerator() {}
 
 void MessageFieldGenerator::
+GenerateWriteToParcelCode(io::Printer* printer) const {
+  printer->Print("{\n");
+  printer->Indent();
+  printer->Print(variables_,
+    "dest.writeByte((byte) (has$capitalized_name$ ? 1 : 0));\n"
+    "if (has$capitalized_name$) {\n"
+    "  dest.writeParcelable($name$_, flags);\n"
+    "}\n");
+  printer->Outdent();
+  printer->Print("}\n");
+}
+
+void MessageFieldGenerator::
+GenerateParcelableConstructorCode(io::Printer* printer) const {
+  printer->Print("{\n");
+  printer->Indent();
+  printer->Print(variables_,
+    "has$capitalized_name$ = source.readByte() == 1;\n"
+    "if (has$capitalized_name$) {\n"
+    "  $name$_ = source.readParcelable(classLoader);\n"
+    "}\n");
+  printer->Outdent();
+  printer->Print("}\n");
+}
+
+void MessageFieldGenerator::
 GenerateFromJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (json.has(\"$original_name$\")) {\n"
@@ -176,6 +202,18 @@ RepeatedMessageFieldGenerator(const FieldDescriptor* descriptor, const Params& p
 }
 
 RepeatedMessageFieldGenerator::~RepeatedMessageFieldGenerator() {}
+
+void RepeatedMessageFieldGenerator::
+GenerateWriteToParcelCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "dest.writeList($name$_);\n");
+}
+
+void RepeatedMessageFieldGenerator::
+GenerateParcelableConstructorCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "$name$_ = (java.util.List<$type$>) source.readArrayList(classLoader);\n");
+}
 
 void RepeatedMessageFieldGenerator::
 GenerateFromJsonCode(io::Printer* printer) const {

@@ -57,6 +57,8 @@ class MessageFieldGenerator : public FieldGenerator {
   void GenerateSerializedSizeCode(io::Printer* printer) const;
   void GenerateToJsonCode(io::Printer* printer) const;
   void GenerateFromJsonCode(io::Printer* printer) const;
+  void GenerateWriteToParcelCode(io::Printer* printer) const;
+  void GenerateParcelableConstructorCode(io::Printer* printer) const;
 
   string GetBoxedType() const;
 
@@ -81,6 +83,8 @@ class RepeatedMessageFieldGenerator : public FieldGenerator {
   void GenerateSerializedSizeCode(io::Printer* printer) const;
   void GenerateToJsonCode(io::Printer* printer) const;
   void GenerateFromJsonCode(io::Printer* printer) const;
+  void GenerateWriteToParcelCode(io::Printer* printer) const;
+  void GenerateParcelableConstructorCode(io::Printer* printer) const;
 
   string GetBoxedType() const;
 
