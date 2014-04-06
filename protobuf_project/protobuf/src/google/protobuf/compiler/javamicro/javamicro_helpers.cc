@@ -245,14 +245,14 @@ JavaType GetJavaType(FieldDescriptor::Type field_type) {
 
 const char* BoxedPrimitiveTypeName(JavaType type) {
   switch (type) {
-    case JAVATYPE_INT    : return "java.lang.Integer";
-    case JAVATYPE_LONG   : return "java.lang.Long";
-    case JAVATYPE_FLOAT  : return "java.lang.Float";
-    case JAVATYPE_DOUBLE : return "java.lang.Double";
-    case JAVATYPE_BOOLEAN: return "java.lang.Boolean";
-    case JAVATYPE_STRING : return "java.lang.String";
+    case JAVATYPE_INT    : return "Integer";
+    case JAVATYPE_LONG   : return "Long";
+    case JAVATYPE_FLOAT  : return "Float";
+    case JAVATYPE_DOUBLE : return "Double";
+    case JAVATYPE_BOOLEAN: return "Boolean";
+    case JAVATYPE_STRING : return "String";
     case JAVATYPE_BYTES  : return "com.google.protobuf.micro.ByteStringMicro";
-    case JAVATYPE_ENUM   : return "java.lang.Integer";
+    case JAVATYPE_ENUM   : return "Integer";
     case JAVATYPE_MESSAGE: return NULL;
 
     // No default because we want the compiler to complain if any new
