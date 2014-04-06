@@ -245,19 +245,12 @@ void MessageGenerator::Generate(io::Printer* printer) {
 
 void MessageGenerator::
 GenerateWriteToParcelCode(io::Printer* printer) {
-  scoped_array<const FieldDescriptor*> sorted_fields(
-    SortFieldsByNumber(descriptor_));
   printer->Print(
     "@Override\n"
-    "public void writeToParcel(android.os.Parcel dest, int flags) {\n");
-  printer->Indent();
-
-  for (int i = 0; i < descriptor_->field_count(); i++) {
-    field_generators_.get(sorted_fields[i]).GenerateWriteToParcelCode(printer);
-  }
-
-  printer->Outdent();
-  printer->Print(
+    "public void writeToParcel(android.os.Parcel dest, int flags) {\n"
+    "  byte[] buf = toByteArray();\n"
+    "  dest.writeInt(buf.length);\n"
+    "  dest.writeByteArray(buf);\n"
     "}\n\n");
 }
 
@@ -266,18 +259,14 @@ GenerateParcelableConstructorCode(io::Printer* printer) {
   scoped_array<const FieldDescriptor*> sorted_fields(
     SortFieldsByNumber(descriptor_));
   printer->Print(
-    "private $classname$(android.os.Parcel source) {\n"
-    "  ClassLoader classLoader = getClass().getClassLoader();\n",
+    "private $classname$(android.os.Parcel source)\n"
+    "      throws com.google.protobuf.micro.InvalidProtocolBufferMicroException {\n"
+    "  int length = source.readInt();\n"
+    "  byte[] buf = new byte[length];\n"
+    "  source.readByteArray(buf);\n"
+    "  mergeFrom(buf);\n"
+    "}\n\n",
     "classname", descriptor_->name());
-  printer->Indent();
-
-  for (int i = 0; i < descriptor_->field_count(); i++) {
-    field_generators_.get(sorted_fields[i]).GenerateParcelableConstructorCode(printer);
-  }
-
-  printer->Outdent();
-  printer->Print(
-    "}\n\n");
 }
 
 void MessageGenerator::
@@ -287,7 +276,11 @@ GenerateParcelableCreatorCode(io::Printer* printer) {
     "        = new android.os.Parcelable.Creator<$classname$>() {\n"
     "  @Override\n"
     "  public $classname$ createFromParcel(android.os.Parcel source) {\n"
-    "    return new $classname$(source);\n"
+    "    try {\n"
+    "      return new $classname$(source);\n"
+    "    } catch (com.google.protobuf.micro.InvalidProtocolBufferMicroException e) {\n"
+    "      return new $classname$();\n"
+    "    }\n"
     "  }\n"
     "\n"
     "  @Override\n"
