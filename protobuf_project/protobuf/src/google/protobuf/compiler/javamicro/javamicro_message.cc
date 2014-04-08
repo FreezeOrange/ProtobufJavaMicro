@@ -194,12 +194,14 @@ void MessageGenerator::Generate(io::Printer* printer) {
   // Note: Fields (which will be emitted in the loop, below) may have the same names as fields in
   // the inner or outer class.  This causes Java warnings, but is not fatal, so we suppress those
   // warnings here in the class declaration.
+  string parcelableStmt = params_.android_use_parcel() ? "implements android.os.Parcelable " : "";
   printer->Print(
     "@SuppressWarnings(\"hiding\")\n"
     "public $modifiers$ final class $classname$ extends\n"
-    "    com.google.protobuf.micro.MessageMicro implements android.os.Parcelable {\n",
+    "    com.google.protobuf.micro.MessageMicro $parcelable${\n",
     "modifiers", is_own_file ? "" : "static",
-    "classname", descriptor_->name());
+    "classname", descriptor_->name(),
+    "parcelable", parcelableStmt);
   printer->Indent();
   printer->Print(
     "public $classname$() {}\n"
@@ -230,12 +232,17 @@ void MessageGenerator::Generate(io::Printer* printer) {
   GenerateMessageSerializationMethods(printer);
   GenerateMergeFromMethods(printer);
   GenerateParseFromMethods(printer);
-  GenerateToJsonCode(printer);
-  GenerateFromJsonCode(printer);
 
-  GenerateWriteToParcelCode(printer);
-  GenerateParcelableConstructorCode(printer);
-  GenerateParcelableCreatorCode(printer);
+  if (params_.java_use_json()) {
+    GenerateToJsonCode(printer);
+    GenerateFromJsonCode(printer);
+  }
+
+  if (params_.android_use_parcel()) {
+    GenerateWriteToParcelCode(printer);
+    GenerateParcelableConstructorCode(printer);
+    GenerateParcelableCreatorCode(printer);
+  }
 
   printer->Outdent();
   printer->Print("}\n\n");

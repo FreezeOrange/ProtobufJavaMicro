@@ -56,6 +56,8 @@ class Params {
   eOptimization optimization_;
   eMultipleFiles override_java_multiple_files_;
   bool java_use_vector_;
+  bool java_use_json_;
+  bool android_use_parcel_;
   NameMap java_packages_;
   NameMap java_outer_classnames_;
   NameSet java_multiple_files_;
@@ -66,7 +68,9 @@ class Params {
     base_name_(base_name),
     optimization_(JAVAMICRO_OPT_DEFAULT),
     override_java_multiple_files_(JAVAMICRO_MUL_UNSET),
-    java_use_vector_(false) {
+    java_use_vector_(false),
+    java_use_json_(false),
+    android_use_parcel_(false) {
   }
 
   const string& base_name() const {
@@ -159,6 +163,20 @@ class Params {
   }
   bool java_use_vector() const {
     return java_use_vector_;
+  }
+
+  void set_java_use_json(bool value) {
+    java_use_json_ = value;
+  }
+  bool java_use_json() const {
+    return java_use_json_;
+  }
+
+  void set_android_use_parcel(bool value) {
+    android_use_parcel_ = value;
+  }
+  bool android_use_parcel() const {
+    return android_use_parcel_;
   }
 
 };

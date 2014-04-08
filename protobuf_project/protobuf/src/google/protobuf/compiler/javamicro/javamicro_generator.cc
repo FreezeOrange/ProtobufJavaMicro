@@ -40,6 +40,7 @@
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/stubs/strutil.h>
+#include <iostream>
 
 namespace google {
 namespace protobuf {
@@ -82,6 +83,7 @@ bool JavaMicroGenerator::Generate(const FileDescriptor* file,
 //  GOOGLE_LOG(WARNING) << "wink: JavaMicroGenerator::Generate WARNING";
 //  GOOGLE_LOG(ERROR) << "wink: JavaMicroGenerator::Generate ERROR";
 //  GOOGLE_LOG(FATAL) << "wink: JavaMicroGenerator::Generate";
+  std::cout << "²ÎÊý£º" << parameter << endl;
 
   ParseGeneratorParameter(parameter, &options);
 
@@ -109,32 +111,38 @@ bool JavaMicroGenerator::Generate(const FileDescriptor* file,
         params.set_optimization(JAVAMICRO_OPT_SPACE);
       } else {
         *error = "Unknown javamicro generator option: opt="
-                  + options[i].second + " expecting opt=space or opt=speed";
+          + options[i].second + " expecting opt=space or opt=speed";
         return false;
       }
     } else if (options[i].first == "java_package") {
-        vector<string> parts;
-        SplitStringUsing(options[i].second, "|", &parts);
-        if (parts.size() != 2) {
-          *error = "Bad java_package, expecting filename|PackageName found '"
-            + options[i].second + "'";
-          return false;
-        }
-        params.set_java_package(parts[0], parts[1]);
+      vector<string> parts;
+      SplitStringUsing(options[i].second, "|", &parts);
+      if (parts.size() != 2) {
+        *error = "Bad java_package, expecting filename|PackageName found '"
+          + options[i].second + "'";
+        return false;
+      }
+      params.set_java_package(parts[0], parts[1]);
     } else if (options[i].first == "java_outer_classname") {
-        vector<string> parts;
-        SplitStringUsing(options[i].second, "|", &parts);
-        if (parts.size() != 2) {
-          *error = "Bad java_outer_classname, "
-                   "expecting filename|ClassName found '"
-                   + options[i].second + "'";
-          return false;
-        }
-        params.set_java_outer_classname(parts[0], parts[1]);
+      vector<string> parts;
+      SplitStringUsing(options[i].second, "|", &parts);
+      if (parts.size() != 2) {
+        *error = "Bad java_outer_classname, "
+          "expecting filename|ClassName found '"
+          + options[i].second + "'";
+        return false;
+      }
+      params.set_java_outer_classname(parts[0], parts[1]);
     } else if (options[i].first == "java_multiple_files") {
-        params.set_override_java_multiple_files(options[i].second == "true");
-    } else if (options[i].first == "java_use_vector") {
-        params.set_java_use_vector(options[i].second == "true");
+      params.set_override_java_multiple_files(options[i].second == "true");
+    } 
+    /*else if (options[i].first == "java_use_vector") {
+    params.set_java_use_vector(options[i].second == "true");
+    }*/ 
+    else if (options[i].first == "java_use_json") {
+      params.set_java_use_json(options[i].second == "true");
+    } else if (options[i].first == "android_use_parcel") {
+      params.set_android_use_parcel(options[i].second == "true");
     } else {
       *error = "Ignore unknown javamicro generator option: " + options[i].first;
     }
