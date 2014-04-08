@@ -40,7 +40,7 @@
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/stubs/strutil.h>
-#include <iostream>
+//#include <iostream>
 
 namespace google {
 namespace protobuf {
@@ -83,7 +83,7 @@ bool JavaMicroGenerator::Generate(const FileDescriptor* file,
 //  GOOGLE_LOG(WARNING) << "wink: JavaMicroGenerator::Generate WARNING";
 //  GOOGLE_LOG(ERROR) << "wink: JavaMicroGenerator::Generate ERROR";
 //  GOOGLE_LOG(FATAL) << "wink: JavaMicroGenerator::Generate";
-  std::cout << "参数：" << parameter << endl;
+  //std::cout << "参数：" << parameter << endl;
 
   ParseGeneratorParameter(parameter, &options);
 
