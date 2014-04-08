@@ -479,34 +479,36 @@ void MessageGenerator::GenerateMergeFromMethods(io::Printer* printer) {
     "\n");
 }
 
-void MessageGenerator::
-GenerateParseFromMethods(io::Printer* printer) {
+void MessageGenerator::GenerateParseFromMethods(io::Printer* printer) {
   // Note:  These are separate from GenerateMessageSerializationMethods()
   //   because they need to be generated even for messages that are optimized
   //   for code size.
-  printer->Print(
-    "public static $classname$ parseFrom(byte[] data)\n"
+  printer->Print("public static $classname$ parseFrom(byte[] data, int off, int len)\n"
     "    throws com.google.protobuf.micro.InvalidProtocolBufferMicroException {\n"
-    "  return ($classname$) (new $classname$().mergeFrom(data));\n"
+    "  return ($classname$) (new $classname$().mergeFrom(data, off, len));\n"
     "}\n"
-    "\n"
-	"public static $classname$ parseFrom(byte[] data, int off, int len)\n"
-	"    throws com.google.protobuf.micro.InvalidProtocolBufferMicroException {\n"
-	"  return ($classname$) (new $classname$().mergeFrom(data, off, len));\n"
-	"}\n"
-	"\n"
-    "public static $classname$ parseFrom(\n"
-    "        com.google.protobuf.micro.CodedInputStreamMicro input)\n"
-    "    throws java.io.IOException {\n"
-    "  return new $classname$().mergeFrom(input);\n"
-    "}\n"
-    "\n"
-	"public static $classname$ parseFrom(java.io.InputStream inputStream)\n"
-	"    throws java.io.IOException {\n"
-	"  return parseFrom(com.google.protobuf.micro.CodedInputStreamMicro.newInstance(inputStream));\n"
-	"}\n"
-	"\n",
+    "\n",
     "classname", descriptor_->name());
+  if (!params_.java_simple_parsefrom()) {
+    printer->Print(
+      "public static $classname$ parseFrom(byte[] data)\n"
+      "    throws com.google.protobuf.micro.InvalidProtocolBufferMicroException {\n"
+      "  return ($classname$) (new $classname$().mergeFrom(data));\n"
+      "}\n"
+      "\n"
+      "public static $classname$ parseFrom(\n"
+      "        com.google.protobuf.micro.CodedInputStreamMicro input)\n"
+      "    throws java.io.IOException {\n"
+      "  return new $classname$().mergeFrom(input);\n"
+      "}\n"
+      "\n"
+      "public static $classname$ parseFrom(java.io.InputStream inputStream)\n"
+      "    throws java.io.IOException {\n"
+      "  return parseFrom(com.google.protobuf.micro.CodedInputStreamMicro.newInstance(inputStream));\n"
+      "}\n"
+      "\n",
+      "classname", descriptor_->name());
+  }
 }
 
 void MessageGenerator::GenerateSerializeOneField(

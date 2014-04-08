@@ -58,6 +58,7 @@ class Params {
   bool java_use_vector_;
   bool java_use_json_;
   bool android_use_parcel_;
+  bool java_simple_parsefrom_;
   NameMap java_packages_;
   NameMap java_outer_classnames_;
   NameSet java_multiple_files_;
@@ -70,7 +71,8 @@ class Params {
     override_java_multiple_files_(JAVAMICRO_MUL_UNSET),
     java_use_vector_(false),
     java_use_json_(false),
-    android_use_parcel_(false) {
+    android_use_parcel_(false),
+    java_simple_parsefrom_(false) {
   }
 
   const string& base_name() const {
@@ -177,6 +179,13 @@ class Params {
   }
   bool android_use_parcel() const {
     return android_use_parcel_;
+  }
+
+  void set_java_simple_parsefrom(bool value) {
+    java_simple_parsefrom_ = value;
+  }
+  bool java_simple_parsefrom() const {
+    return java_simple_parsefrom_;
   }
 
 };

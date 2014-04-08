@@ -143,6 +143,8 @@ bool JavaMicroGenerator::Generate(const FileDescriptor* file,
       params.set_java_use_json(options[i].second == "true");
     } else if (options[i].first == "android_use_parcel") {
       params.set_android_use_parcel(options[i].second == "true");
+    } else if (options[i].first == "java_simple_parsefrom") {
+      params.set_java_simple_parsefrom(options[i].second == "true");
     } else {
       *error = "Ignore unknown javamicro generator option: " + options[i].first;
     }
