@@ -30,8 +30,8 @@
 
 package com.google.protobuf.micro;
 
+import android.os.Bundle;
 import org.json.JSONException;
-import org.json.JSONStringer;
 
 import java.io.IOException;
 
@@ -139,10 +139,24 @@ public abstract class MessageMicro {
         return input.skipField(tag);
     }
 
+    /**
+     * 将 protobuf 实体转换为 JSON 字符串对象的方法。
+     * 注：默认没有实现！
+     *
+     * @return
+     * @throws JSONException
+     */
     public String toJSON() throws JSONException {
-        JSONStringer stringer = new JSONStringer();
-        stringer.object();
-        stringer.endObject();
-        return stringer.toString();
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * 将 protobuf 实体转换为 {@link android.os.Bundle} 对象的方法。
+     * 注：默认没有实现！
+     *
+     * @return
+     */
+    public Bundle toBundle() {
+        throw new UnsupportedOperationException();
     }
 }
