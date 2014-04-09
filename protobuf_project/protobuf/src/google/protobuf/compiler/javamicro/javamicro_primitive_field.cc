@@ -199,8 +199,8 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor, const Params param
     (*variables)["null_check"] =
         "  if (value == null) {\n"
         //"    throw new NullPointerException();\n"
-        "    return this;\n"
-		"  }\n";
+        "      return this;\n"
+		"    }\n";
   } else {
     (*variables)["null_check"] = "";
   }
@@ -210,11 +210,11 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor, const Params param
   }
   (*variables)["message_name"] = descriptor->containing_type()->name();
   (*variables)["original_name"] = descriptor->name();
-  if (descriptor->type() == FieldDescriptor::TYPE_BYTES) {
+  /*if (descriptor->type() == FieldDescriptor::TYPE_BYTES) {
     (*variables)["bytes_method"] = ".toStringUtf8()";
   } else {
     (*variables)["bytes_method"] = "";
-  }
+  }*/
 }
 }  // namespace
 
@@ -227,6 +227,108 @@ PrimitiveFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 }
 
 PrimitiveFieldGenerator::~PrimitiveFieldGenerator() {}
+
+void PrimitiveFieldGenerator::
+GenerateToBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (has$capitalized_name$()) {\n");
+  printer->Indent();
+
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType) {
+  case JAVATYPE_INT:
+    printer->Print(variables_,
+      "bundle.putInt(\"$original_name$\", get$capitalized_name$());\n");
+    break;
+  case JAVATYPE_LONG:
+    printer->Print(variables_,
+      "bundle.putLong(\"$original_name$\", get$capitalized_name$());\n");
+    break;
+  case JAVATYPE_BOOLEAN:
+    printer->Print(variables_,
+      "bundle.putBoolean(\"$original_name$\", get$capitalized_name$());\n");
+    break;
+  case JAVATYPE_FLOAT:
+    printer->Print(variables_,
+      "bundle.putFloat(\"$original_name$\", get$capitalized_name$());\n");
+    break;
+  case JAVATYPE_DOUBLE:
+    printer->Print(variables_,
+      "bundle.putDouble(\"$original_name$\", get$capitalized_name$());\n");
+    break;
+  case JAVATYPE_STRING:
+    printer->Print(variables_,
+      "String value = get$capitalized_name$();\n"
+      "if (value != null) {\n"
+      "  bundle.putString(\"$original_name$\", value);\n"
+      "}\n");
+    break;
+  case JAVATYPE_BYTES:
+    printer->Print(variables_,
+      "com.google.protobuf.micro.ByteStringMicro value = get$capitalized_name$();\n"
+      "if (value != null) {\n"
+      "  bundle.putByteArray(\"$original_name$\", value.toByteArray());\n"
+      "}\n");
+    break;
+  default:
+    GOOGLE_LOG(FATAL) << "Can't get here.";
+    break;
+  }
+
+  printer->Outdent();
+  printer->Print("}\n");
+}
+
+void PrimitiveFieldGenerator::
+GenerateFromBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (bundle.containsKey(\"$original_name$\")) {\n");
+  printer->Indent();
+
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType) {
+  case JAVATYPE_INT:
+    printer->Print(variables_,
+      "result.set$capitalized_name$(bundle.getInt(\"$original_name$\"));\n");
+    break;
+  case JAVATYPE_LONG:
+    printer->Print(variables_,
+      "result.set$capitalized_name$(bundle.getLong(\"$original_name$\"));\n");
+    break;
+  case JAVATYPE_BOOLEAN:
+    printer->Print(variables_,
+      "result.set$capitalized_name$(bundle.getBoolean(\"$original_name$\"));\n");
+    break;
+  case JAVATYPE_FLOAT:
+    printer->Print(variables_,
+      "result.set$capitalized_name$(bundle.getFloat(\"$original_name$\"));\n");
+    break;
+  case JAVATYPE_DOUBLE:
+    printer->Print(variables_,
+      "result.set$capitalized_name$(bundle.getDouble(\"$original_name$\"));\n");
+    break;
+  case JAVATYPE_STRING:
+    printer->Print(variables_,
+      "String value = bundle.getString(\"$original_name$\");\n"
+      "if (value != null) {\n"
+      "  result.set$capitalized_name$(value);\n"
+      "}\n");
+    break;
+  case JAVATYPE_BYTES:
+    printer->Print(variables_,
+      "byte[] array = bundle.getByteArray(\"$original_name$\");\n"
+      "if (array != null && array.length > 0) {\n"
+      "  result.set$capitalized_name$(com.google.protobuf.micro.ByteStringMicro.copyFrom(array));\n"
+      "}\n");
+    break;
+  default:
+    GOOGLE_LOG(FATAL) << "Can't get here.";
+    break;
+  }
+
+  printer->Outdent();
+  printer->Print("}\n");
+}
 
 void PrimitiveFieldGenerator::
 GenerateWriteToParcelCode(io::Printer* printer) const {
@@ -353,12 +455,18 @@ GenerateFromJsonCode(io::Printer* printer) const {
     break;
   case JAVATYPE_STRING:
     printer->Print(variables_,
-      "result.set$capitalized_name$(json.getString(\"$original_name$\"));\n");
+      "String value = json.getString(\"$original_name$\");\n"
+      "if (value != null) {\n"
+      "  result.set$capitalized_name$(value);\n"
+      "}\n");
     break;
   case JAVATYPE_BYTES:
     printer->Print(variables_,
-      "result.set$capitalized_name$(\n"
-      "        com.google.protobuf.micro.ByteStringMicro.copyFromUtf8(json.getString(\"$original_name$\")));\n");
+      "String value = json.getString(\"$original_name$\");\n"
+      "if (value != null) {\n"
+      "  result.set$capitalized_name$(\n"
+      "          com.google.protobuf.micro.ByteStringMicro.copyFromUtf8(value));\n"
+      "}\n");
     break;
   default:
     GOOGLE_LOG(FATAL) << "Can't get here.";
@@ -372,9 +480,34 @@ GenerateFromJsonCode(io::Printer* printer) const {
 void PrimitiveFieldGenerator::
 GenerateToJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
-    "if (has$capitalized_name$()) {\n"
-    "  stringer.key(\"$original_name$\").value(get$capitalized_name$()$bytes_method$);\n"
-    "}\n");
+    "if (has$capitalized_name$()) {\n");
+  printer->Indent();
+
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType)
+  {
+  case JAVATYPE_STRING:
+    printer->Print(variables_,
+      "String value = get$capitalized_name$();\n"
+      "if (value != null) {\n"
+      "  stringer.key(\"$original_name$\").value(value);\n"
+      "}\n");
+    break;
+  case JAVATYPE_BYTES:
+    printer->Print(variables_,
+      "com.google.protobuf.micro.ByteStringMicro value = getA15();\n"
+      "if (value != null) {\n"
+      "  stringer.key(\"$original_name$\").value(value.toStringUtf8());\n"
+      "}\n");
+    break;
+  default:
+    printer->Print(variables_,
+      "stringer.key(\"$original_name$\").value(get$capitalized_name$());\n");
+    break;
+  }
+  
+  printer->Outdent();
+  printer->Print("}\n");
 }
 
 void PrimitiveFieldGenerator::
@@ -497,6 +630,199 @@ RepeatedPrimitiveFieldGenerator(const FieldDescriptor* descriptor, const Params&
 RepeatedPrimitiveFieldGenerator::~RepeatedPrimitiveFieldGenerator() {}
 
 void RepeatedPrimitiveFieldGenerator::
+GenerateToBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "count = get$capitalized_name$Count();\n"
+    "if (count > 0) {\n");
+  printer->Indent();
+
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType) {
+  case JAVATYPE_INT:
+    printer->Print(variables_,
+      "int[] array = new int[count];\n"
+      "Integer value;\n"
+      "for (int i = 0; i < count; ++i) {\n"
+      "  value = get$capitalized_name$(i);\n"
+      "  array[i] = value == null ? 0 : value.intValue();\n"
+      "}\n"
+      "bundle.putIntArray(\"$original_name$\", array);\n");
+    break;
+  case JAVATYPE_LONG:
+    printer->Print(variables_,
+      "long[] array = new long[count];\n"
+      "Long value;\n"
+      "for (int i = 0; i < count; ++i) {\n"
+      "  value = get$capitalized_name$(i);\n"
+      "  array[i] = value == null ? 0 : value.longValue();\n"
+      "}\n"
+      "bundle.putLongArray(\"$original_name$\", array);\n");
+    break;
+  case JAVATYPE_BOOLEAN:
+    printer->Print(variables_,
+      "boolean[] array = new boolean[count];\n"
+      "Boolean value;\n"
+      "for (int i = 0; i < count; ++i) {\n"
+      "  value = get$capitalized_name$(i);\n"
+      "  array[i] = value == null ? false : value.booleanValue();\n"
+      "}\n"
+      "bundle.putBooleanArray(\"$original_name$\", array);\n");
+    break;
+  case JAVATYPE_FLOAT:
+    printer->Print(variables_,
+      "float[] array = new float[count];\n"
+      "Float value;\n"
+      "for (int i = 0; i < count; ++i) {\n"
+      "  value = get$capitalized_name$(i);\n"
+      "  array[i] = value == null ? 0.0f : value.floatValue();\n"
+      "}\n"
+      "bundle.putFloatArray(\"$original_name$\", array);\n");
+    break;
+  case JAVATYPE_DOUBLE:
+    printer->Print(variables_,
+      "double[] array = new double[count];\n"
+      "Double value;\n"
+      "for (int i = 0; i < count; ++i) {\n"
+      "  value = get$capitalized_name$(i);\n"
+      "  array[i] = value == null ? 0.0 : value.doubleValue();\n"
+      "}\n"
+      "bundle.putDoubleArray(\"$original_name$\", array);\n");
+    break;
+  case JAVATYPE_STRING:
+    printer->Print(variables_,
+      "String[] array = new String[count];\n"
+      "for (int i = 0; i < count; ++i) {\n"
+      "  array[i] = get$capitalized_name$(i);\n"
+      "}\n"
+      "bundle.putStringArray(\"$original_name$\", array);\n");
+    break;
+  case JAVATYPE_BYTES:
+    printer->Print(variables_,
+      "byte[][] array = new byte[count][];\n"
+      "com.google.protobuf.micro.ByteStringMicro value;\n"
+      "for (int i = 0; i < count; ++i) {\n"
+      "  value = get$capitalized_name$(i);\n"
+      "  if (value != null) {\n"
+      "    array[i] = value.toByteArray();\n"
+      "  }\n"
+      "}\n"
+      "bundle.putSerializable(\"$original_name$\", array);\n");
+    break;
+  default:
+    GOOGLE_LOG(FATAL) << "Can't get here.";
+    break;
+  }
+
+  printer->Outdent();
+  printer->Print("}\n");
+}
+
+void RepeatedPrimitiveFieldGenerator::
+GenerateFromBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (bundle.containsKey(\"$original_name$\")) {\n");
+  printer->Indent();
+
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType) {
+  case JAVATYPE_INT:
+    printer->Print(variables_,
+      "int[] array = bundle.getIntArray(\"$original_name$\");\n"
+      "if (array != null) {\n"
+      "  count = array.length;\n"
+      "  if (count > 0) {\n"
+      "    for (int i = 0; i < count; ++i) {\n"
+      "      result.add$capitalized_name$(array[i]);\n"
+      "    }\n"
+      "  }\n"
+      "}\n");
+    break;
+  case JAVATYPE_LONG:
+    printer->Print(variables_,
+      "long[] array = bundle.getLongArray(\"$original_name$\");\n"
+      "if (array != null) {\n"
+      "  count = array.length;\n"
+      "  if (count > 0) {\n"
+      "    for (int i = 0; i < count; ++i) {\n"
+      "      result.add$capitalized_name$(array[i]);\n"
+      "    }\n"
+      "  }\n"
+      "}\n");
+    break;
+  case JAVATYPE_BOOLEAN:
+    printer->Print(variables_,
+      "boolean[] array = bundle.getBooleanArray(\"$original_name$\");\n"
+      "if (array != null) {\n"
+      "  count = array.length;\n"
+      "  if (count > 0) {\n"
+      "    for (int i = 0; i < count; ++i) {\n"
+      "      result.add$capitalized_name$(array[i]);\n"
+      "    }\n"
+      "  }\n"
+      "}\n");
+    break;
+  case JAVATYPE_FLOAT:
+    printer->Print(variables_,
+      "float[] array = bundle.getFloatArray(\"$original_name$\");\n"
+      "if (array != null) {\n"
+      "  count = array.length;\n"
+      "  if (count > 0) {\n"
+      "    for (int i = 0; i < count; ++i) {\n"
+      "      result.add$capitalized_name$(array[i]);\n"
+      "    }\n"
+      "  }\n"
+      "}\n");
+    break;
+  case JAVATYPE_DOUBLE:
+    printer->Print(variables_,
+      "double[] array = bundle.getDoubleArray(\"$original_name$\");\n"
+      "if (array != null) {\n"
+      "  count = array.length;\n"
+      "  if (count > 0) {\n"
+      "    for (int i = 0; i < count; ++i) {\n"
+      "      result.add$capitalized_name$(array[i]);\n"
+      "    }\n"
+      "  }\n"
+      "}\n");
+    break;
+  case JAVATYPE_STRING:
+    printer->Print(variables_,
+      "String[] array = bundle.getStringArray(\"$original_name$\");\n"
+      "if (array != null) {\n"
+      "  count = array.length;\n"
+      "  if (count > 0) {\n"
+      "    for (int i = 0; i < count; ++i) {\n"
+      "      result.add$capitalized_name$(array[i]);\n"
+      "    }\n"
+      "  }\n"
+      "}\n");
+    break;
+  case JAVATYPE_BYTES:
+    printer->Print(variables_,
+      "byte[][] array = (byte[][]) bundle.getSerializable(\"$original_name$\");\n"
+      "if (array != null) {\n"
+      "  count = array.length;\n"
+      "  if (count > 0) {\n"
+      "    byte[] value;\n"
+      "    for (int i = 0; i < count; ++i) {\n"
+      "      value = array[i];\n"
+      "      if (value != null && value.length > 0) {\n"
+      "        result.add$capitalized_name$(com.google.protobuf.micro.ByteStringMicro.copyFrom(value));\n"
+      "      }\n"
+      "    }\n"
+      "  }\n"
+      "}\n");
+    break;
+  default:
+    GOOGLE_LOG(FATAL) << "Can't get here.";
+    break;
+  }
+
+  printer->Outdent();
+  printer->Print("}\n");
+}
+
+void RepeatedPrimitiveFieldGenerator::
 GenerateWriteToParcelCode(io::Printer* printer) const {
   printer->Print(variables_,
     "dest.writeList($name$_);\n");
@@ -518,9 +844,7 @@ GenerateFromJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (json.has(\"$original_name$\")) {\n"
     "  array = json.getJSONArray(\"$original_name$\");\n"
-    "  count = array.length();\n"
-    "  for (int i = 0; i < count; ++i) {\n");
-  printer->Indent();
+    "  count = array.length();\n");
   printer->Indent();
 
   JavaType javaType = GetJavaType(descriptor_);
@@ -528,39 +852,49 @@ GenerateFromJsonCode(io::Printer* printer) const {
   {
   case JAVATYPE_INT:
     printer->Print(variables_,
-      "result.add$capitalized_name$(array.getInt(i));\n");
+      "for (int i = 0; i < count; ++i) {\n"
+      "  result.add$capitalized_name$(array.getInt(i));\n");
     break;
   case JAVATYPE_LONG:
     printer->Print(variables_,
-      "result.add$capitalized_name$(array.getLong(i));\n");
+      "for (int i = 0; i < count; ++i) {\n"
+      "  result.add$capitalized_name$(array.getLong(i));\n");
     break;
   case JAVATYPE_FLOAT:
     printer->Print(variables_,
-      "result.add$capitalized_name$((float) array.getDouble(i));\n");
+      "for (int i = 0; i < count; ++i) {\n"
+      "  result.add$capitalized_name$((float) array.getDouble(i));\n");
     break;
   case JAVATYPE_DOUBLE:
     printer->Print(variables_,
-      "result.add$capitalized_name$(array.getDouble(i));\n");
+      "for (int i = 0; i < count; ++i) {\n"
+      "  result.add$capitalized_name$(array.getDouble(i));\n");
     break;
   case JAVATYPE_BOOLEAN:
     printer->Print(variables_,
-      "result.add$capitalized_name$(array.getBoolean(i));\n");
+      "for (int i = 0; i < count; ++i) {\n"
+      "  result.add$capitalized_name$(array.getBoolean(i));\n");
     break;
   case JAVATYPE_STRING:
     printer->Print(variables_,
-      "result.add$capitalized_name$(array.getString(i));\n");
+      "for (int i = 0; i < count; ++i) {\n"
+      "  result.add$capitalized_name$(array.getString(i));\n");
     break;
   case JAVATYPE_BYTES:
     printer->Print(variables_,
-      "result.add$capitalized_name$(\n"
-      "        com.google.protobuf.micro.ByteStringMicro.copyFromUtf8(array.getString(i)));\n");
+      "String value;\n"
+      "for (int i = 0; i < count; ++i) {\n"
+      "  value = array.getString(i);\n"
+      "  if (value != null) {\n"
+      "    result.add$capitalized_name$(\n"
+      "            com.google.protobuf.micro.ByteStringMicro.copyFromUtf8(value));\n"
+      "  }\n");
     break;
   default:
     GOOGLE_LOG(FATAL) << "Can't get here.";
     break;
   }
 
-  printer->Outdent();
   printer->Outdent();
   printer->Print(
     "  }\n"
@@ -572,10 +906,41 @@ GenerateToJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "count = get$capitalized_name$Count();\n"
     "if (count > 0) {\n"
-    "  stringer.key(\"$original_name$\").array();\n"
-    "  for (int i = 0; i < count; ++i) {\n"
-    "    stringer.value(get$capitalized_name$(i)$bytes_method$);\n"
-    "  }\n"
+    "  stringer.key(\"$original_name$\").array();\n");
+  printer->Indent();
+
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType) {
+  case JAVATYPE_STRING:
+    printer->Print(variables_,
+      "String value;\n"
+      "for (int i = 0; i < count; ++i) {\n"
+      "  value = get$capitalized_name$(i);\n"
+      "  if (value != null) {\n"
+      "    stringer.value(value);\n"
+      "  }\n"
+      "}\n");
+    break;
+  case JAVATYPE_BYTES:
+    printer->Print(variables_,
+      "com.google.protobuf.micro.ByteStringMicro value;\n"
+      "for (int i = 0; i < count; ++i) {\n"
+      "  value = get$capitalized_name$(i);\n"
+      "  if (value != null) {\n"
+      "    stringer.value(value.toStringUtf8());\n"
+      "  }\n"
+      "}\n");
+    break;
+  default:
+    printer->Print(variables_,
+      "for (int i = 0; i < count; ++i) {\n"
+      "  stringer.value(get$capitalized_name$(i));\n"
+      "}\n");
+    break;
+  }
+
+  printer->Outdent();
+  printer->Print(
     "  stringer.endArray();\n"
     "}\n");
 }
@@ -625,13 +990,13 @@ GenerateMembers(io::Printer* printer) const {
         "}\n"
         "public $message_name$ set$capitalized_name$(int index, $type$ value) {\n"
         "$null_check$"
-        "  $name$_.set(index, value);\n"
+        "    $name$_.set(index, value);\n"
         "  $name$Utf8_ = null;\n"
         "  return this;\n"
         "}\n"
         "public $message_name$ add$capitalized_name$($type$ value) {\n"
         "$null_check$"
-        "  if ($name$_.isEmpty()) {\n"
+        "    if ($name$_.isEmpty()) {\n"
         "    $name$_ = new java.util.ArrayList<$type$>();\n"
         "  }\n"
         "  $name$_.add(value);\n"
@@ -707,12 +1072,12 @@ GenerateMembers(io::Printer* printer) const {
       "}\n"
       "public $message_name$ set$capitalized_name$(int index, $type$ value) {\n"
       "$null_check$"
-      "  $name$_.set(index, value);\n"
+      "    $name$_.set(index, value);\n"
       "  return this;\n"
       "}\n"
       "public $message_name$ add$capitalized_name$($type$ value) {\n"
       "$null_check$"
-      "  if ($name$_.isEmpty()) {\n"
+      "    if ($name$_.isEmpty()) {\n"
       "    $name$_ = new java.util.ArrayList<$boxed_type$>();\n"
       "  }\n"
       "  $name$_.add(value);\n"

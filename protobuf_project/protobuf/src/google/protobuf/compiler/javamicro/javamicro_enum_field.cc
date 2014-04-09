@@ -80,6 +80,22 @@ EnumFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 EnumFieldGenerator::~EnumFieldGenerator() {}
 
 void EnumFieldGenerator::
+GenerateToBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (has$capitalized_name$()) {\n"
+    "  bundle.putInt(\"$original_name$\", get$capitalized_name$());\n"
+    "}\n");
+}
+
+void EnumFieldGenerator::
+GenerateFromBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (bundle.containsKey(\"$original_name$\")) {\n"
+    "  result.set$capitalized_name$(bundle.getInt(\"$original_name$\"));\n"
+    "}\n");
+}
+
+void EnumFieldGenerator::
 GenerateWriteToParcelCode(io::Printer* printer) const {
   printer->Print("{\n");
   printer->Indent();
@@ -184,6 +200,37 @@ RepeatedEnumFieldGenerator(const FieldDescriptor* descriptor, const Params& para
 }
 
 RepeatedEnumFieldGenerator::~RepeatedEnumFieldGenerator() {}
+
+void RepeatedEnumFieldGenerator::
+GenerateToBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "count = get$capitalized_name$Count();\n"
+    "if (count > 0) {\n"
+    "  int[] array = new int[count];\n"
+    "  Integer value;\n"
+    "  for (int i = 0; i < count; ++i) {\n"
+    "    value = get$capitalized_name$(i);\n"
+    "    array[i] = value == null ? 0 : value.intValue();\n"
+    "  }\n"
+    "  bundle.putIntArray(\"$original_name$\", array);\n"
+    "}\n");
+}
+
+void RepeatedEnumFieldGenerator::
+GenerateFromBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (bundle.containsKey(\"$original_name$\")) {\n"
+    "  int[] array = bundle.getIntArray(\"$original_name$\");\n"
+    "  if (array != null) {\n"
+    "    count = array.length;\n"
+    "    if (count > 0) {\n"
+    "      for (int i = 0; i < count; ++i) {\n"
+    "        result.add$capitalized_name$(array[i]);\n"
+    "      }\n"
+    "    }\n"
+    "  }\n"
+    "}\n");
+}
 
 void RepeatedEnumFieldGenerator::
 GenerateWriteToParcelCode(io::Printer* printer) const {

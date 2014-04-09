@@ -59,6 +59,8 @@ class EnumFieldGenerator : public FieldGenerator {
   void GenerateFromJsonCode(io::Printer* printer) const;
   void GenerateWriteToParcelCode(io::Printer* printer) const;
   void GenerateParcelableConstructorCode(io::Printer* printer) const;
+  void GenerateToBundleCode(io::Printer* printer) const;
+  void GenerateFromBundleCode(io::Printer* printer) const;
 
   string GetBoxedType() const;
 
@@ -84,6 +86,8 @@ class RepeatedEnumFieldGenerator : public FieldGenerator {
   void GenerateFromJsonCode(io::Printer* printer) const;
   void GenerateWriteToParcelCode(io::Printer* printer) const;
   void GenerateParcelableConstructorCode(io::Printer* printer) const;
+  void GenerateToBundleCode(io::Printer* printer) const;
+  void GenerateFromBundleCode(io::Printer* printer) const;
 
   string GetBoxedType() const;
 

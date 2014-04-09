@@ -79,6 +79,28 @@ MessageFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 MessageFieldGenerator::~MessageFieldGenerator() {}
 
 void MessageFieldGenerator::
+GenerateToBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (has$capitalized_name$()) {\n"
+    "  $type$ value = get$capitalized_name$();\n"
+    "  if (value != null) {\n"
+    "    bundle.putBundle(\"$original_name$\", value.toBundle());\n"
+    "  }\n"
+    "}\n");
+}
+
+void MessageFieldGenerator::
+GenerateFromBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (bundle.containsKey(\"$original_name$\")) {\n"
+    "  android.os.Bundle value = bundle.getBundle(\"$original_name$\");\n"
+    "  if (value != null) {\n"
+    "    result.set$capitalized_name$($type$.fromBundle(value));\n"
+    "  }\n"
+    "}\n");
+}
+
+void MessageFieldGenerator::
 GenerateWriteToParcelCode(io::Printer* printer) const {
   printer->Print("{\n");
   printer->Indent();
@@ -202,6 +224,43 @@ RepeatedMessageFieldGenerator(const FieldDescriptor* descriptor, const Params& p
 }
 
 RepeatedMessageFieldGenerator::~RepeatedMessageFieldGenerator() {}
+
+void RepeatedMessageFieldGenerator::
+GenerateToBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "count = get$capitalized_name$Count();\n"
+    "if (count > 0) {\n"
+    "  android.os.Bundle[] array = new android.os.Bundle[count];\n"
+    "  $type$ value;\n"
+    "  for (int i = 0; i < count; ++i) {\n"
+    "    value = get$capitalized_name$(i);\n"
+    "    if (value != null) {\n"
+    "      array[i] = value.toBundle();\n"
+    "    }\n"
+    "  }\n"
+    "  bundle.putParcelableArray(\"$original_name$\", array);\n"
+    "}\n");
+}
+
+void RepeatedMessageFieldGenerator::
+GenerateFromBundleCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (bundle.containsKey(\"$original_name$\")) {\n"
+    "  android.os.Bundle[] array = (android.os.Bundle[]) bundle.getParcelableArray(\"$original_name$\");\n"
+    "  if (array != null) {\n"
+    "    count = array.length;\n"
+    "    if (count > 0) {\n"
+    "      android.os.Bundle value;\n"
+    "      for (int i = 0; i < count; ++i) {\n"
+    "        value = array[i];\n"
+    "        if (value != null) {\n"
+    "          result.add$capitalized_name$($type$.fromBundle(value));\n"
+    "        }\n"
+    "      }\n"
+    "    }\n"
+    "  }\n"
+    "}\n");
+}
 
 void RepeatedMessageFieldGenerator::
 GenerateWriteToParcelCode(io::Printer* printer) const {

@@ -244,11 +244,62 @@ void MessageGenerator::Generate(io::Printer* printer) {
     GenerateParcelableCreatorCode(printer);
   }
 
+  GenerateToBundleCode(printer);
+  GenerateFromBundleCode(printer);
+
   printer->Outdent();
   printer->Print("}\n\n");
 }
 
 // ===================================================================
+
+void MessageGenerator::
+GenerateToBundleCode(io::Printer* printer) {
+  scoped_array<const FieldDescriptor*> sorted_fields(
+    SortFieldsByNumber(descriptor_));
+  printer->Print(
+    "@Override\n"
+    "public android.os.Bundle toBundle() {\n"
+    "  android.os.Bundle bundle = new android.os.Bundle();\n");
+  if (HasRepeatedFields(descriptor_)) {
+    printer->Print(
+      "  int count;\n");
+  }
+  printer->Indent();
+
+  for (int i = 0; i < descriptor_->field_count(); i++) {
+    field_generators_.get(sorted_fields[i]).GenerateToBundleCode(printer);
+  }
+
+  printer->Outdent();
+  printer->Print(
+    "  return bundle;\n"
+    "}\n\n");
+}
+
+void MessageGenerator::
+GenerateFromBundleCode(io::Printer* printer) {
+  scoped_array<const FieldDescriptor*> sorted_fields(
+    SortFieldsByNumber(descriptor_));
+  printer->Print(
+    "public static $classname$ fromBundle(android.os.Bundle bundle) {\n"
+    "  $classname$ result = new $classname$();\n",
+    "classname", descriptor_->name());
+  if (HasRepeatedFields(descriptor_)) {
+    printer->Print(
+      "  int count;\n");
+  }
+  printer->Indent();
+
+  for (int i = 0; i < descriptor_->field_count(); i++) {
+    field_generators_.get(sorted_fields[i]).GenerateFromBundleCode(printer);
+  }
+
+  printer->Outdent();
+  printer->Print(
+    "  return result;\n"
+    "}\n\n");
+}
 
 void MessageGenerator::
 GenerateWriteToParcelCode(io::Printer* printer) {
@@ -263,8 +314,6 @@ GenerateWriteToParcelCode(io::Printer* printer) {
 
 void MessageGenerator::
 GenerateParcelableConstructorCode(io::Printer* printer) {
-  scoped_array<const FieldDescriptor*> sorted_fields(
-    SortFieldsByNumber(descriptor_));
   printer->Print(
     "private $classname$(android.os.Parcel source)\n"
     "      throws com.google.protobuf.micro.InvalidProtocolBufferMicroException {\n"
@@ -298,7 +347,7 @@ GenerateParcelableCreatorCode(io::Printer* printer) {
     "@Override\n"
     "public int describeContents() {\n"
     "  return 0;\n"
-    "}\n",
+    "}\n\n",
     "classname", descriptor_->name());
 }
 
