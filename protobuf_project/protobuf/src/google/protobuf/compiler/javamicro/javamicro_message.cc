@@ -244,8 +244,10 @@ void MessageGenerator::Generate(io::Printer* printer) {
     GenerateParcelableCreatorCode(printer);
   }
 
-  GenerateToBundleCode(printer);
-  GenerateFromBundleCode(printer);
+  if (params_.android_use_bundle()) {
+    GenerateToBundleCode(printer);
+    GenerateFromBundleCode(printer);
+  }
 
   printer->Outdent();
   printer->Print("}\n\n");

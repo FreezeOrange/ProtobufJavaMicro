@@ -58,6 +58,7 @@ class Params {
   bool java_use_vector_;
   bool java_use_json_;
   bool android_use_parcel_;
+  bool android_use_bundle_;
   bool java_simple_parsefrom_;
   NameMap java_packages_;
   NameMap java_outer_classnames_;
@@ -72,7 +73,8 @@ class Params {
     java_use_vector_(false),
     java_use_json_(false),
     android_use_parcel_(false),
-    java_simple_parsefrom_(false) {
+    java_simple_parsefrom_(false),
+    android_use_bundle_(false) {
   }
 
   const string& base_name() const {
@@ -186,6 +188,13 @@ class Params {
   }
   bool java_simple_parsefrom() const {
     return java_simple_parsefrom_;
+  }
+
+  void set_android_use_bundle(bool value) {
+    android_use_bundle_ = value;
+  }
+  bool android_use_bundle() const {
+    return android_use_bundle_;
   }
 
 };

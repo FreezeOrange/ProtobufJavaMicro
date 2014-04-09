@@ -130,8 +130,11 @@ void MessageFieldGenerator::
 GenerateFromJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (json.has(\"$original_name$\")) {\n"
-    "  result.set$capitalized_name$(\n"
-    "          $type$.fromJSON(json.getJSONObject(\"$original_name$\").toString()));\n"
+    "  org.json.JSONObject value = json.optJSONObject(\"$original_name$\");\n"
+    "  if (value != null) {\n"
+    "    result.set$capitalized_name$(\n"
+    "            $type$.fromJSON(value.toString()));\n"
+    "  }\n"
     "}\n");
 }
 
@@ -139,7 +142,10 @@ void MessageFieldGenerator::
 GenerateToJsonCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (has$capitalized_name$()) {\n"
-    "  stringer.key(\"$original_name$\").value(new org.json.JSONObject(get$capitalized_name$().toJSON()));\n"
+    "  $type$ value = get$capitalized_name$();\n"
+    "  if (value != null) {\n"
+    "    stringer.key(\"$original_name$\").value(new org.json.JSONObject(value.toJSON()));\n"
+    "  }\n"
     "}\n");
 }
 
@@ -280,9 +286,13 @@ GenerateFromJsonCode(io::Printer* printer) const {
     "if (json.has(\"$original_name$\")) {\n"
     "  array = json.getJSONArray(\"$original_name$\");\n"
     "  count = array.length();\n"
+    "  org.json.JSONObject value;\n"
     "  for (int i = 0; i < count; ++i) {\n"
-    "    result.add$capitalized_name$(\n"
-    "            $type$.fromJSON(array.getJSONObject(i).toString()));\n"
+    "    value = array.optJSONObject(i);\n"
+    "    if (value != null) {\n"
+    "      result.add$capitalized_name$(\n"
+    "              $type$.fromJSON(value.toString()));\n"
+    "    }\n"
     "  }\n"
     "}\n");
 }
@@ -293,8 +303,12 @@ GenerateToJsonCode(io::Printer* printer) const {
     "count = get$capitalized_name$Count();\n"
     "if (count > 0) {\n"
     "  stringer.key(\"$original_name$\").array();\n"
+    "  $type$ value;\n"
     "  for (int i = 0; i < count; ++i) {\n"
-    "    stringer.value(new org.json.JSONObject(get$capitalized_name$(i).toJSON()));\n"
+    "    value = get$capitalized_name$(i);\n"
+    "    if (value != null) {\n"
+    "      stringer.value(new org.json.JSONObject(value.toJSON()));\n"
+    "    }\n"
     "  }\n"
     "  stringer.endArray();\n"
     "}\n");
