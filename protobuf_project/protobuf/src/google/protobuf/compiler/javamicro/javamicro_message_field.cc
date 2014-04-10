@@ -162,7 +162,7 @@ GenerateMembers(io::Printer* printer) const {
     "public $message_name$ set$capitalized_name$($type$ value) {\n"
     "  if (value == null) {\n"
 //    "    throw new NullPointerException();\n"
-    "    return clear$capitalized_name$();"
+    "    return clear$capitalized_name$();\n"
     "  }\n"
     "  has$capitalized_name$ = true;\n"
     "  $name$_ = value;\n"
