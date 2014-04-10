@@ -534,14 +534,6 @@ void MessageGenerator::GenerateParseFromMethods(io::Printer* printer) {
   // Note:  These are separate from GenerateMessageSerializationMethods()
   //   because they need to be generated even for messages that are optimized
   //   for code size.
-  printer->Print(
-    "public static $classname$ parseFrom(\n"
-    "        com.google.protobuf.micro.CodedInputStreamMicro input)\n"
-    "    throws java.io.IOException {\n"
-    "  return new $classname$().mergeFrom(input);\n"
-    "}\n"
-    "\n",
-    "classname", descriptor_->name());
   if (!params_.java_simple_parsefrom()) {
     printer->Print(
       "public static $classname$ parseFrom(byte[] data)\n"
@@ -557,6 +549,12 @@ void MessageGenerator::GenerateParseFromMethods(io::Printer* printer) {
       "public static $classname$ parseFrom(java.io.InputStream inputStream)\n"
       "    throws java.io.IOException {\n"
       "  return parseFrom(com.google.protobuf.micro.CodedInputStreamMicro.newInstance(inputStream));\n"
+      "}\n"
+      "\n"
+      "public static $classname$ parseFrom(\n"
+      "        com.google.protobuf.micro.CodedInputStreamMicro input)\n"
+      "    throws java.io.IOException {\n"
+      "  return new $classname$().mergeFrom(input);\n"
       "}\n"
       "\n",
       "classname", descriptor_->name());
