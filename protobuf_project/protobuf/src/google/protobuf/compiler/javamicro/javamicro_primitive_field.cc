@@ -198,9 +198,8 @@ void SetPrimitiveVariables(const FieldDescriptor* descriptor, const Params param
   if (IsReferenceType(GetJavaType(descriptor))) {
     (*variables)["null_check"] =
         "  if (value == null) {\n"
-        //"    throw new NullPointerException();\n"
         "      return this;\n"
-		"    }\n";
+		    "    }\n  ";
   } else {
     (*variables)["null_check"] = "";
   }
@@ -536,6 +535,9 @@ GenerateMembers(io::Printer* printer) const {
     if (IsVariableLenType(GetJavaType(descriptor_))) {
       printer->Print(variables_,
         "public $message_name$ set$capitalized_name$($type$ value) {\n"
+        "  if (value == null) {\n"
+        "    return clear$capitalized_name$();\n"
+        "  }\n"
         "  has$capitalized_name$ = true;\n"
         "  $name$_ = value;\n"
         "  return this;\n"
@@ -990,13 +992,13 @@ GenerateMembers(io::Printer* printer) const {
         "}\n"
         "public $message_name$ set$capitalized_name$(int index, $type$ value) {\n"
         "$null_check$"
-        "    $name$_.set(index, value);\n"
+        "  $name$_.set(index, value);\n"
         "  $name$Utf8_ = null;\n"
         "  return this;\n"
         "}\n"
         "public $message_name$ add$capitalized_name$($type$ value) {\n"
         "$null_check$"
-        "    if ($name$_.isEmpty()) {\n"
+        "  if ($name$_.isEmpty()) {\n"
         "    $name$_ = new java.util.ArrayList<$type$>();\n"
         "  }\n"
         "  $name$_.add(value);\n"
@@ -1072,12 +1074,12 @@ GenerateMembers(io::Printer* printer) const {
       "}\n"
       "public $message_name$ set$capitalized_name$(int index, $type$ value) {\n"
       "$null_check$"
-      "    $name$_.set(index, value);\n"
+      "  $name$_.set(index, value);\n"
       "  return this;\n"
       "}\n"
       "public $message_name$ add$capitalized_name$($type$ value) {\n"
       "$null_check$"
-      "    if ($name$_.isEmpty()) {\n"
+      "  if ($name$_.isEmpty()) {\n"
       "    $name$_ = new java.util.ArrayList<$boxed_type$>();\n"
       "  }\n"
       "  $name$_.add(value);\n"
