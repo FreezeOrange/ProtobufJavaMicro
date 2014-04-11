@@ -232,6 +232,7 @@ GenerateToUriCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (has$capitalized_name$()) {\n"
     "  prefixAndChar(query);\n");
+  printer->Indent();
   JavaType javaType = GetJavaType(descriptor_);
   switch (javaType) {
     case JAVATYPE_BYTES:
@@ -243,6 +244,7 @@ GenerateToUriCode(io::Printer* printer) const {
         "query.append(\"$original_name$\").append(\"=\").append(get$capitalized_name$());\n");
       break;
   }
+  printer->Outdent();
   printer->Print("}\n");
 }
 

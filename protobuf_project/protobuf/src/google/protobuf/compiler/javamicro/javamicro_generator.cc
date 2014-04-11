@@ -141,6 +141,8 @@ bool JavaMicroGenerator::Generate(const FileDescriptor* file,
     }*/ 
     else if (options[i].first == "java_use_json") {
       params.set_java_use_json(options[i].second == "true");
+    } else if (options[i].first == "java_use_uri") {
+      params.set_java_use_uri(options[i].second == "true");
     } else if (options[i].first == "android_use_parcel") {
       params.set_android_use_parcel(options[i].second == "true");
     } else if (options[i].first == "android_use_bundle") {

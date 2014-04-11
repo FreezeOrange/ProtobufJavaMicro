@@ -249,7 +249,9 @@ void MessageGenerator::Generate(io::Printer* printer) {
     GenerateFromBundleCode(printer);
   }
 
-  GenerateToUriCode(printer);
+  if (params_.java_use_uri()) {
+    GenerateToUriCode(printer);
+  }
 
   printer->Outdent();
   printer->Print("}\n\n");
