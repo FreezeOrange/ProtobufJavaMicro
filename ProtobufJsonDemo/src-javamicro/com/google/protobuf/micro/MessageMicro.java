@@ -163,7 +163,7 @@ public abstract class MessageMicro {
     }
 
     /**
-     * 将 protobuf 实体转换为 {@link java.net.URI} 对象。默认返回 null！
+     * 将 protobuf 实体转换为 {@link java.net.URI} 对象。
      *
      * @param scheme
      * @param userInfo
@@ -176,7 +176,9 @@ public abstract class MessageMicro {
      * @throws URISyntaxException
      */
     public URI toUri(String scheme, String userInfo, String host, int port, String path, String fragment) throws URISyntaxException {
-        return null;
+        StringBuilder builder = new StringBuilder();
+        toUriQuery(builder);
+        return new java.net.URI(scheme, userInfo, host, port, path, builder.toString(), fragment);
     }
 
     public URI toUri(String scheme, String host, int port, String path, String fragment) throws URISyntaxException {
@@ -193,5 +195,13 @@ public abstract class MessageMicro {
 
     public URI toUri(String host, String path) throws URISyntaxException {
         return toUri("http", null, host, -1, path, null);
+    }
+
+    protected void toUriQuery(StringBuilder builder) {}
+
+    protected void prefixAndChar(StringBuilder builder) {
+        if (builder.length() > 0) {
+            builder.append("&");
+        }
     }
 }
