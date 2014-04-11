@@ -229,9 +229,14 @@ PrimitiveFieldGenerator::~PrimitiveFieldGenerator() {}
 
 void PrimitiveFieldGenerator::
 GenerateToUriCode(io::Printer* printer) const {
+  bool has_default_value = descriptor_->has_default_value();
+  if (!has_default_value) {
+    printer->Print(variables_,
+      "if (has$capitalized_name$()) {\n");
+    printer->Indent();
+  }
   printer->Print(variables_,
-    "if (has$capitalized_name$()) {\n"
-    "  prefixAndChar(query);\n");
+    "prefixAndChar(query);\n");
   printer->Indent();
   JavaType javaType = GetJavaType(descriptor_);
   switch (javaType) {
@@ -244,8 +249,11 @@ GenerateToUriCode(io::Printer* printer) const {
         "query.append(\"$original_name$\").append(\"=\").append(get$capitalized_name$());\n");
       break;
   }
-  printer->Outdent();
-  printer->Print("}\n");
+
+  if (!has_default_value) {
+    printer->Outdent();
+    printer->Print("}\n");
+  }
 }
 
 void PrimitiveFieldGenerator::
@@ -515,7 +523,7 @@ GenerateToJsonCode(io::Printer* printer) const {
     break;
   case JAVATYPE_BYTES:
     printer->Print(variables_,
-      "com.google.protobuf.micro.ByteStringMicro value = getA15();\n"
+      "com.google.protobuf.micro.ByteStringMicro value = get$capitalized_name$();\n"
       "if (value != null) {\n"
       "  stringer.key(\"$original_name$\").value(value.toStringUtf8());\n"
       "}\n");
