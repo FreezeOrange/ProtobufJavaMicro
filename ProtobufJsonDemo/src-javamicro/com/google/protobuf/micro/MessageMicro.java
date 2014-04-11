@@ -175,24 +175,23 @@ public abstract class MessageMicro {
      * @return
      * @throws URISyntaxException
      */
-    public URI toUri(String scheme, String userInfo, String host, int port, String path, String query,
-                     String fragment) throws URISyntaxException {
+    public URI toUri(String scheme, String userInfo, String host, int port, String path, String fragment) throws URISyntaxException {
         return null;
     }
 
-    public URI toUri(String scheme, String host, int port, String path, String query, String fragment) throws URISyntaxException {
-        return toUri(scheme, null, host, port, path, query, fragment);
+    public URI toUri(String scheme, String host, int port, String path, String fragment) throws URISyntaxException {
+        return toUri(scheme, null, host, port, path, fragment);
     }
 
-    public URI toUri(String scheme, String host, String path, String query, String fragment) throws URISyntaxException {
-        return toUri(scheme, null, host, -1, path, query, fragment);
+    public URI toUri(String scheme, String host, String path, String fragment) throws URISyntaxException {
+        return toUri(scheme, null, host, -1, path, fragment);
     }
 
-    public URI toUri(String host, String path, String query, String fragment) throws URISyntaxException {
-        return toUri("http", null, host, -1, path, query, fragment);
+    public URI toUri(String host, String path, String fragment) throws URISyntaxException {
+        return toUri("http", null, host, -1, path, fragment);
     }
 
-    public URI toUri(String host, String path, String query) throws URISyntaxException {
-        return toUri("http", null, host, -1, path, query, null);
+    public URI toUri(String host, String path) throws URISyntaxException {
+        return toUri("http", null, host, -1, path, null);
     }
 }
