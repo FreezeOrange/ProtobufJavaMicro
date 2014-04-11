@@ -61,6 +61,7 @@ class MessageFieldGenerator : public FieldGenerator {
   void GenerateParcelableConstructorCode(io::Printer* printer) const;
   void GenerateToBundleCode(io::Printer* printer) const;
   void GenerateFromBundleCode(io::Printer* printer) const;
+  void GenerateToUriCode(io::Printer* printer) const;
 
   string GetBoxedType() const;
 
@@ -89,6 +90,7 @@ class RepeatedMessageFieldGenerator : public FieldGenerator {
   void GenerateParcelableConstructorCode(io::Printer* printer) const;
   void GenerateToBundleCode(io::Printer* printer) const;
   void GenerateFromBundleCode(io::Printer* printer) const;
+  void GenerateToUriCode(io::Printer* printer) const;
 
   string GetBoxedType() const;
 

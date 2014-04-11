@@ -228,6 +228,25 @@ PrimitiveFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 PrimitiveFieldGenerator::~PrimitiveFieldGenerator() {}
 
 void PrimitiveFieldGenerator::
+GenerateToUriCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (has$capitalized_name$()) {\n"
+    "  prefixAndChar(query);\n");
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType) {
+    case JAVATYPE_BYTES:
+      printer->Print(variables_,
+        "query.append(\"$original_name$\").append(\"=\").append(get$capitalized_name$().toStringUtf8());\n");
+      break;
+    default:
+      printer->Print(variables_,
+        "query.append(\"$original_name$\").append(\"=\").append(get$capitalized_name$());\n");
+      break;
+  }
+  printer->Print("}\n");
+}
+
+void PrimitiveFieldGenerator::
 GenerateToBundleCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (has$capitalized_name$()) {\n");
@@ -630,6 +649,34 @@ RepeatedPrimitiveFieldGenerator(const FieldDescriptor* descriptor, const Params&
 }
 
 RepeatedPrimitiveFieldGenerator::~RepeatedPrimitiveFieldGenerator() {}
+
+void RepeatedPrimitiveFieldGenerator::
+GenerateToUriCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "count = get$capitalized_name$Count();\n"
+    "if (count > 0) {\n"
+    "  prefixAndChar(query);\n"
+    "  query.append(\"(\");\n"
+    "  for (int i = 0; i < count; ++i) {\n"
+    "    if (i != 0) {\n"
+    "      query.append(\",\");\n"
+    "    }\n");
+  JavaType javaType = GetJavaType(descriptor_);
+  switch (javaType) {
+  case JAVATYPE_BYTES:
+    printer->Print(variables_,
+      "    query.append(get$capitalized_name$(i).toStringUtf8());\n");
+    break;
+  default:
+    printer->Print(variables_,
+      "    query.append(get$capitalized_name$(i));\n");
+    break;
+  }
+  printer->Print(variables_,
+    "  }\n"
+    "  query.append(\")\");\n"
+    "}\n");
+}
 
 void RepeatedPrimitiveFieldGenerator::
 GenerateToBundleCode(io::Printer* printer) const {

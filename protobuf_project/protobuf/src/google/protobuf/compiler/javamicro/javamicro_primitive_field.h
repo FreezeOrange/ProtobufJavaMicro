@@ -61,6 +61,7 @@ class PrimitiveFieldGenerator : public FieldGenerator {
   void GenerateParcelableConstructorCode(io::Printer* printer) const;
   void GenerateToBundleCode(io::Printer* printer) const;
   void GenerateFromBundleCode(io::Printer* printer) const;
+  void GenerateToUriCode(io::Printer* printer) const;
 
   string GetBoxedType() const;
 
@@ -88,6 +89,7 @@ class RepeatedPrimitiveFieldGenerator : public FieldGenerator {
   void GenerateParcelableConstructorCode(io::Printer* printer) const;
   void GenerateToBundleCode(io::Printer* printer) const;
   void GenerateFromBundleCode(io::Printer* printer) const;
+  void GenerateToUriCode(io::Printer* printer) const;
 
   string GetBoxedType() const;
 

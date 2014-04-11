@@ -68,6 +68,7 @@ class FieldGenerator {
   virtual void GenerateParcelableConstructorCode(io::Printer* printer) const = 0;
   virtual void GenerateToBundleCode(io::Printer* printer) const = 0;
   virtual void GenerateFromBundleCode(io::Printer* printer) const = 0;
+  virtual void GenerateToUriCode(io::Printer* printer) const = 0;
 
   virtual string GetBoxedType() const = 0;
 

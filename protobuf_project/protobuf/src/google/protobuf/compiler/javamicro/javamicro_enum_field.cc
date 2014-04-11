@@ -80,6 +80,15 @@ EnumFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 EnumFieldGenerator::~EnumFieldGenerator() {}
 
 void EnumFieldGenerator::
+GenerateToUriCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (has$capitalized_name$()) {\n"
+    "  prefixAndChar(query);\n"
+    "  query.append(\"$original_name$\").append(\"=\").append(get$capitalized_name$());\n"
+    "}\n");
+}
+
+void EnumFieldGenerator::
 GenerateToBundleCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (has$capitalized_name$()) {\n"
@@ -200,6 +209,23 @@ RepeatedEnumFieldGenerator(const FieldDescriptor* descriptor, const Params& para
 }
 
 RepeatedEnumFieldGenerator::~RepeatedEnumFieldGenerator() {}
+
+void RepeatedEnumFieldGenerator::
+GenerateToUriCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "count = get$capitalized_name$Count();\n"
+    "if (count > 0) {\n"
+    "  prefixAndChar(query);\n"
+    "  query.append(\"(\");\n"
+    "  for (int i = 0; i < count; ++i) {\n"
+    "    if (i != 0) {\n"
+    "      query.append(\",\");\n"
+    "    }\n"
+    "    query.append(get$capitalized_name$(i));\n"
+    "  }\n"
+    "  query.append(\")\");\n"
+    "}\n");
+}
 
 void RepeatedEnumFieldGenerator::
 GenerateToBundleCode(io::Printer* printer) const {

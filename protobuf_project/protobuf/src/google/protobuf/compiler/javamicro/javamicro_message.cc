@@ -249,11 +249,34 @@ void MessageGenerator::Generate(io::Printer* printer) {
     GenerateFromBundleCode(printer);
   }
 
+  GenerateToUriCode(printer);
+
   printer->Outdent();
   printer->Print("}\n\n");
 }
 
 // ===================================================================
+
+void MessageGenerator::
+GenerateToUriCode(io::Printer* printer) {
+  scoped_array<const FieldDescriptor*> sorted_fields(
+    SortFieldsByNumber(descriptor_));
+  printer->Print(
+    "@Override\n"
+    "public void toUriQuery(StringBuilder query) {\n");
+  if (HasRepeatedFields(descriptor_)) {
+    printer->Print(
+      "  int count;\n");
+  }
+  printer->Indent();
+
+  for (int i = 0; i < descriptor_->field_count(); i++) {
+    field_generators_.get(sorted_fields[i]).GenerateToUriCode(printer);
+  }
+
+  printer->Outdent();
+  printer->Print("}\n\n");
+}
 
 void MessageGenerator::
 GenerateToBundleCode(io::Printer* printer) {

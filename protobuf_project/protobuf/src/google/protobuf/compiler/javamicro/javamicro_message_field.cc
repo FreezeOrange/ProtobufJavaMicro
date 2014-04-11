@@ -79,6 +79,18 @@ MessageFieldGenerator(const FieldDescriptor* descriptor, const Params& params)
 MessageFieldGenerator::~MessageFieldGenerator() {}
 
 void MessageFieldGenerator::
+GenerateToUriCode(io::Printer* printer) const {
+  printer->Print(variables_,
+    "if (has$capitalized_name$()) {\n"
+    "  prefixAndChar(query);\n"
+    "  $type$ value = get$capitalized_name$();\n"
+    "  if (value != null) {\n"
+    "    value.toUriQuery(query);\n"
+    "  }\n"
+    "}\n");
+}
+
+void MessageFieldGenerator::
 GenerateToBundleCode(io::Printer* printer) const {
   printer->Print(variables_,
     "if (has$capitalized_name$()) {\n"
@@ -230,6 +242,11 @@ RepeatedMessageFieldGenerator(const FieldDescriptor* descriptor, const Params& p
 }
 
 RepeatedMessageFieldGenerator::~RepeatedMessageFieldGenerator() {}
+
+void RepeatedMessageFieldGenerator::
+GenerateToUriCode(io::Printer* printer) const {
+  // 不支持 repeated message 的 toUri 方法
+}
 
 void RepeatedMessageFieldGenerator::
 GenerateToBundleCode(io::Printer* printer) const {

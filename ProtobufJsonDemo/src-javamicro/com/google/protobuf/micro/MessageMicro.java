@@ -204,4 +204,5 @@ public abstract class MessageMicro {
             builder.append("&");
         }
     }
+
 }

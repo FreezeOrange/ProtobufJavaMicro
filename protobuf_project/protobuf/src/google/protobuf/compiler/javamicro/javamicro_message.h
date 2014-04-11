@@ -87,6 +87,8 @@ class MessageGenerator {
   void GenerateToBundleCode(io::Printer* printer);
   void GenerateFromBundleCode(io::Printer* printer);
 
+  void GenerateToUriCode(io::Printer* printer);
+
   const Params& params_;
   const Descriptor* descriptor_;
   FieldGeneratorMap field_generators_;
