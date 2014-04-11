@@ -34,6 +34,8 @@ import android.os.Bundle;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Abstract interface implemented by Protocol Message objects.
@@ -158,5 +160,39 @@ public abstract class MessageMicro {
      */
     public Bundle toBundle() {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * 将 protobuf 实体转换为 {@link java.net.URI} 对象。默认返回 null！
+     *
+     * @param scheme
+     * @param userInfo
+     * @param host
+     * @param port
+     * @param path
+     * @param query
+     * @param fragment
+     * @return
+     * @throws URISyntaxException
+     */
+    public URI toUri(String scheme, String userInfo, String host, int port, String path, String query,
+                     String fragment) throws URISyntaxException {
+        return null;
+    }
+
+    public URI toUri(String scheme, String host, int port, String path, String query, String fragment) throws URISyntaxException {
+        return toUri(scheme, null, host, port, path, query, fragment);
+    }
+
+    public URI toUri(String scheme, String host, String path, String query, String fragment) throws URISyntaxException {
+        return toUri(scheme, null, host, -1, path, query, fragment);
+    }
+
+    public URI toUri(String host, String path, String query, String fragment) throws URISyntaxException {
+        return toUri("http", null, host, -1, path, query, fragment);
+    }
+
+    public URI toUri(String host, String path, String query) throws URISyntaxException {
+        return toUri("http", null, host, -1, path, query, null);
     }
 }
