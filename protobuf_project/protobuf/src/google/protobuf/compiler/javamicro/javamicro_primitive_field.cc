@@ -237,7 +237,6 @@ GenerateToUriCode(io::Printer* printer) const {
   }
   printer->Print(variables_,
     "prefixAndChar(query);\n");
-  printer->Indent();
   JavaType javaType = GetJavaType(descriptor_);
   switch (javaType) {
     case JAVATYPE_BYTES:
