@@ -197,7 +197,13 @@ public abstract class MessageMicro {
         return toUri("http", null, host, -1, path, null);
     }
 
-    protected void toUriQuery(StringBuilder builder) {}
+    /**
+     * 子类实现这个方法
+     * @param builder
+     */
+    protected void toUriQuery(StringBuilder builder) {
+        throw new UnsupportedOperationException();
+    }
 
     protected void prefixAndChar(StringBuilder builder) {
         if (builder.length() > 0) {
