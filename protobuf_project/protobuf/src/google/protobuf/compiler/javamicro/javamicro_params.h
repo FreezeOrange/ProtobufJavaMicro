@@ -53,6 +53,7 @@ class Params {
  private:
   string empty_;
   string base_name_;
+  string all_same_package_name_;
   eOptimization optimization_;
   eMultipleFiles override_java_multiple_files_;
   bool java_use_vector_;
@@ -204,6 +205,13 @@ class Params {
   }
   bool java_use_uri() const {
     return java_use_uri_;
+  }
+
+  void set_java_same_package(const string& name) {
+    all_same_package_name_ = name;
+  }
+  const string& java_same_package() const {
+    return all_same_package_name_;
   }
 
 };

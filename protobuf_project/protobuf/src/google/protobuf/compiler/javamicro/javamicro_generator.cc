@@ -149,6 +149,8 @@ bool JavaMicroGenerator::Generate(const FileDescriptor* file,
       params.set_android_use_bundle(options[i].second == "true");
     } else if (options[i].first == "java_simple_parsefrom") {
       params.set_java_simple_parsefrom(options[i].second == "true");
+    } else if (options[i].first == "java_same_package") {
+      params.set_java_same_package(options[i].second);
     } else {
       *error = "Ignore unknown javamicro generator option: " + options[i].first;
     }
