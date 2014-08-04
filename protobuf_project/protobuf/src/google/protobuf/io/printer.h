@@ -82,8 +82,7 @@ class LIBPROTOBUF_EXPORT Printer {
   // Like the first Print(), except the substitutions are given as parameters.
   void Print(const char* text, const char* variable1, const string& value1,
                                const char* variable2, const string& value2);
-  void Printer::Print(const char* text,
-                               const char* variable1, const string& value1,
+  void Print(const char* text, const char* variable1, const string& value1,
                                const char* variable2, const string& value2,
                                const char* variable3, const string& value3);
   // TODO(kenton):  Overloaded versions with more variables?  Two seems
